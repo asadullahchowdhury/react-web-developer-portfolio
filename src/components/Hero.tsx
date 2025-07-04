@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { ArrowDown, Github, Linkedin, Mail, Code, Terminal, Zap } from 'lucide-react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
@@ -33,11 +33,11 @@ const Hero = () => {
     // Animate main title with stagger effect
     if (titleRef.current) {
       const titleChars = titleRef.current.querySelectorAll('.char');
-      tl.fromTo(titleChars, 
+      tl.fromTo(titleChars,
         { y: 100, opacity: 0, rotationX: -90 },
-        { 
-          y: 0, 
-          opacity: 1, 
+        {
+          y: 0,
+          opacity: 1,
           rotationX: 0,
           duration: 0.8,
           stagger: 0.05,
@@ -70,9 +70,9 @@ const Hero = () => {
       const buttons = buttonsRef.current.querySelectorAll('button');
       tl.fromTo(buttons,
         { y: 30, opacity: 0, scale: 0.9 },
-        { 
-          y: 0, 
-          opacity: 1, 
+        {
+          y: 0,
+          opacity: 1,
           scale: 1,
           duration: 0.6,
           stagger: 0.1,
@@ -87,9 +87,9 @@ const Hero = () => {
       const socialLinks = socialRef.current.querySelectorAll('a');
       tl.fromTo(socialLinks,
         { y: 20, opacity: 0, scale: 0.8 },
-        { 
-          y: 0, 
-          opacity: 1, 
+        {
+          y: 0,
+          opacity: 1,
           scale: 1,
           duration: 0.5,
           stagger: 0.1,
@@ -141,15 +141,15 @@ const Hero = () => {
     <>
       <CursorDot />
       <CodingParticles />
-      
-      <section 
+
+      <section id={'hero'}
         ref={heroRef}
         className="min-h-screen flex items-center justify-center relative overflow-hidden bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900"
         style={{ paddingTop: '6rem' }} // Add top spacing from navbar
       >
         {/* Animated background grid */}
         <div className="absolute inset-0 opacity-20">
-          <div 
+          <div
             className="absolute inset-0"
             style={{
               backgroundImage: `
@@ -164,16 +164,16 @@ const Hero = () => {
 
         {/* Floating code icons */}
         <div className="absolute inset-0 pointer-events-none">
-          <Code 
-            className="absolute top-20 left-20 text-cyan-400/20 animate-pulse" 
+          <Code
+            className="absolute top-20 left-20 text-cyan-400/20 animate-pulse"
             size={40}
           />
-          <Terminal 
-            className="absolute top-40 right-32 text-purple-400/20 animate-bounce" 
+          <Terminal
+            className="absolute top-40 right-32 text-purple-400/20 animate-bounce"
             size={35}
           />
-          <Zap 
-            className="absolute bottom-40 left-32 text-cyan-400/20 animate-pulse" 
+          <Zap
+            className="absolute bottom-40 left-32 text-cyan-400/20 animate-pulse"
             size={30}
           />
         </div>
@@ -198,9 +198,9 @@ const Hero = () => {
                 </div>
               </h1>
             </div>
-            
+
             {/* Subtitle */}
-            <p 
+            <p
               ref={subtitleRef}
               className="text-xl md:text-2xl text-gray-300 mb-12 leading-relaxed"
             >
@@ -210,19 +210,19 @@ const Hero = () => {
             </p>
 
             {/* Typewriter code terminal */}
-            <div 
+            <div
               ref={codeRef}
               className="mb-12"
             >
               <TypewriterCode />
             </div>
-            
+
             {/* Action buttons */}
-            <div 
+            <div
               ref={buttonsRef}
               className="flex flex-col sm:flex-row gap-6 justify-center mb-16"
             >
-              <button 
+              <button
                 onClick={() => {
                   const projectsSection = document.getElementById('projects');
                   if (projectsSection) {
@@ -241,7 +241,7 @@ const Hero = () => {
                 </span>
                 <div className="absolute inset-0 bg-gradient-to-r from-purple-600 to-cyan-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
               </button>
-              
+
               <button className="group relative border-2 border-cyan-400 text-cyan-400 px-8 py-4 rounded-full font-semibold transition-all duration-300 hover:bg-cyan-400 hover:text-slate-900 hover:shadow-lg hover:shadow-cyan-400/25 transform hover:scale-105">
                 <span className="relative z-10 flex items-center justify-center space-x-2">
                   <Terminal size={20} />
@@ -249,9 +249,9 @@ const Hero = () => {
                 </span>
               </button>
             </div>
-            
+
             {/* Social links */}
-            <div 
+            <div
               ref={socialRef}
               className="flex justify-center space-x-8 mb-16"
             >
@@ -260,9 +260,9 @@ const Hero = () => {
                 { icon: Linkedin, href: '#', label: 'LinkedIn' },
                 { icon: Mail, href: 'mailto:crahat4@gmail.com', label: 'Email' }
               ].map((social, index) => (
-                <a 
+                <a
                   key={index}
-                  href={social.href} 
+                  href={social.href}
                   className="group relative p-4 text-gray-400 hover:text-cyan-400 transition-all duration-300 transform hover:scale-125 hover:-translate-y-2"
                   aria-label={social.label}
                 >
@@ -273,7 +273,7 @@ const Hero = () => {
               ))}
             </div>
           </div>
-          
+
           {/* Scroll indicator */}
           <button
             onClick={scrollToAbout}

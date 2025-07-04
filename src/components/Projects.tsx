@@ -1,4 +1,3 @@
-import React from 'react';
 import { ExternalLink, Github } from 'lucide-react';
 
 const Projects = () => {
@@ -41,24 +40,24 @@ const Projects = () => {
     <section id="projects" className="py-20 bg-slate-800">
       <div className="container mx-auto px-6">
         <div className="max-w-6xl mx-auto">
-          <h2 
+          <h2
             className="text-4xl font-bold text-white text-center mb-16"
             data-aos="fade-up"
           >
             Featured <span className="text-cyan-400">Projects</span>
           </h2>
-          
+
           <div className="grid md:grid-cols-2 gap-8">
             {projects.map((project, index) => (
-              <div 
-                key={index} 
+              <div
+                key={index}
                 className="bg-slate-900 rounded-lg overflow-hidden hover:transform hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-cyan-500/25 group"
                 data-aos="fade-in-right"
                 data-aos-delay={index * 200}
               >
                 <div className="relative overflow-hidden h-48">
-                  <img 
-                    src={project.image} 
+                  <img
+                    src={project.image}
                     alt={project.title}
                     className="w-full h-full object-cover transition-all duration-[3000ms] ease-linear group-hover:object-top object-top"
                     style={{
@@ -76,26 +75,26 @@ const Projects = () => {
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-slate-900/80 to-transparent"></div>
                 </div>
-                
+
                 <div className="p-6">
-                  <h3 
+                  <h3
                     className="text-xl font-bold text-white mb-3"
                     data-aos="fade-in"
                     data-aos-delay={index * 200 + 100}
                   >
                     {project.title}
                   </h3>
-                  <p 
+                  <p
                     className="text-gray-300 mb-4 leading-relaxed"
                     data-aos="fade-in-left"
                     data-aos-delay={index * 200 + 200}
                   >
                     {project.description}
                   </p>
-                  
+
                   <div className="flex flex-wrap gap-2 mb-4">
                     {project.technologies.map((tech, techIndex) => (
-                      <span 
+                      <span
                         key={techIndex}
                         className="bg-slate-700 text-cyan-400 px-3 py-1 rounded-full text-sm font-medium hover:bg-slate-600 transition-colors duration-200"
                         data-aos="fade-in"
@@ -105,9 +104,9 @@ const Projects = () => {
                       </span>
                     ))}
                   </div>
-                  
+
                   <div className="flex space-x-4">
-                    <a 
+                    <a
                       href={project.liveUrl}
                       className="flex items-center space-x-2 text-cyan-400 hover:text-cyan-300 transition-colors duration-200 group/link"
                       data-aos="fade-in"
@@ -116,7 +115,7 @@ const Projects = () => {
                       <ExternalLink size={16} className="group-hover/link:scale-110 transition-transform duration-200" />
                       <span>Live Demo</span>
                     </a>
-                    <a 
+                    <a
                       href={project.githubUrl}
                       className="flex items-center space-x-2 text-gray-400 hover:text-white transition-colors duration-200 group/link"
                       data-aos="fade-in"

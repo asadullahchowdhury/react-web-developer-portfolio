@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Code, Terminal, Zap } from 'lucide-react';
 
 const Preloader = ({ onComplete }: { onComplete: () => void }) => {
@@ -17,13 +17,13 @@ const Preloader = ({ onComplete }: { onComplete: () => void }) => {
     const interval = setInterval(() => {
       setProgress(prev => {
         const newProgress = prev + Math.random() * 15 + 5;
-        
+
         // Update loading text based on progress
         const stepIndex = Math.floor((newProgress / 100) * loadingSteps.length);
         if (stepIndex < loadingSteps.length) {
           setLoadingText(loadingSteps[stepIndex]);
         }
-        
+
         if (newProgress >= 100) {
           clearInterval(interval);
           setTimeout(() => {
@@ -78,7 +78,7 @@ const Preloader = ({ onComplete }: { onComplete: () => void }) => {
         {/* Progress bar */}
         <div className="w-80 mx-auto mb-6">
           <div className="bg-slate-700 rounded-full h-2 overflow-hidden">
-            <div 
+            <div
               className="bg-gradient-to-r from-cyan-400 to-purple-600 h-full rounded-full transition-all duration-300 ease-out relative"
               style={{ width: `${progress}%` }}
             >

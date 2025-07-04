@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Menu, X, Code } from 'lucide-react';
 import { gsap } from 'gsap';
 import { ScrollToPlugin } from 'gsap/ScrollToPlugin';
@@ -43,12 +43,12 @@ const Header = () => {
               </div>
               <div className="absolute inset-0 bg-gradient-to-br from-cyan-400 to-purple-600 rounded-lg blur-sm opacity-50 animate-pulse"></div>
             </div>
-            <div className="text-2xl font-bold">
+            <button type={"button"} onClick={() => scrollToSection('hero')} className="text-2xl font-bold">
               <span className="text-cyan-400">Rahat</span>
               <span className="text-white"> Chowdhury</span>
-            </div>
+            </button>
           </div>
-          
+
           {/* Desktop Navigation */}
           <div className="hidden md:flex space-x-8">
             {['About', 'Skills', 'Projects', 'Experience', 'Contact'].map((item) => (
