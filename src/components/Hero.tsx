@@ -178,7 +178,7 @@ const Hero = () => {
           />
         </div>
 
-        <div className="container mx-auto px-6 text-center relative z-10">
+        <div className="container mx-auto px-6 pt-44 text-center relative z-10">
           <div className="max-w-6xl mx-auto">
             {/* Developer name above title */}
             <div ref={nameRef} className="mb-6">
@@ -189,11 +189,11 @@ const Hero = () => {
 
             {/* Main heading with character animation */}
             <div ref={titleRef} className="mb-8">
-              <h1 className="text-6xl md:text-8xl font-bold text-white leading-tight mb-4">
-                <div className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-purple-400 to-cyan-400 mb-2">
+              <h1 className="sm:text-6xl text-4xl md:text-8xl font-bold leading-tight mb-4">
+                <div className=" bg-clip-text bg-gradient-to-r text-cyan-400 from-cyan-400 via-purple-400 to-cyan-400 mb-2">
                   {splitTextIntoChars('Rahat')}
                 </div>
-                <div className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-cyan-400 to-purple-400">
+                <div className=" bg-clip-text bg-gradient-to-r text-purple-400 from-purple-400 via-cyan-400 to-purple-400">
                   {splitTextIntoChars('Chowdhury')}
                 </div>
               </h1>
