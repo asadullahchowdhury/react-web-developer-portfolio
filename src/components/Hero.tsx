@@ -129,6 +129,11 @@ const Hero = () => {
     }
   };
 
+  const handleDownloadResume = () => {
+    const resumeUrl = '/images/resume.pdf';
+    window.open(resumeUrl, '_blank');
+  }
+
   const splitTextIntoChars = (text: string) => {
     return text.split('').map((char, index) => (
       <span key={index} className="char inline-block">
@@ -242,8 +247,9 @@ const Hero = () => {
                 <div className="absolute inset-0 bg-gradient-to-r from-purple-600 to-cyan-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
               </button>
 
-              <button className="group relative border-2 border-cyan-400 text-cyan-400 px-8 py-4 rounded-full font-semibold transition-all duration-300 hover:bg-cyan-400 hover:text-slate-900 hover:shadow-lg hover:shadow-cyan-400/25 transform hover:scale-105">
-                <span className="relative z-10 flex items-center justify-center space-x-2">
+              <button className="group relative border-2 border-cyan-400 text-cyan-400 px-8 py-4 rounded-full font-semibold transition-all duration-300 hover:bg-cyan-400 hover:text-slate-900 hover:shadow-lg hover:shadow-cyan-400/25 transform hover:scale-105"
+                      onClick={handleDownloadResume}>
+                <span className="relative z-10 flex items-center justify-center space-x-2" >
                   <Terminal size={20} />
                   <span>Download Resume</span>
                 </span>
@@ -256,8 +262,8 @@ const Hero = () => {
               className="flex justify-center space-x-8 mb-16"
             >
               {[
-                { icon: Github, href: '#', label: 'GitHub' },
-                { icon: Linkedin, href: '#', label: 'LinkedIn' },
+                { icon: Github, href: 'https://github.com/asadullahchowdhury', label: 'GitHub' },
+                { icon: Linkedin, href: 'https://www.linkedin.com/in/chowdhuryrahat', label: 'LinkedIn' },
                 { icon: Mail, href: 'mailto:crahat4@gmail.com', label: 'Email' }
               ].map((social, index) => (
                 <a
