@@ -1,4 +1,4 @@
-import React from 'react';
+
 import { Github, Linkedin, Mail, Heart } from 'lucide-react';
 
 const Footer = () => {
@@ -17,24 +17,27 @@ const Footer = () => {
                 Building the future, one line of code at a time.
               </p>
             </div>
-            
+
             <div className="flex space-x-6" data-aos="fade-in" data-aos-delay="400">
-              <a 
-                href="#" 
+              <a
+                  target="_blank"
+                href="https://github.com/asadullahchowdhury"
                 className="text-gray-400 hover:text-cyan-400 transition-colors duration-200 transform hover:scale-110"
                 aria-label="GitHub"
               >
                 <Github size={24} />
               </a>
-              <a 
-                href="#" 
+              <a
+                  target="_blank"
+                href="https://www.linkedin.com/in/chowdhuryrahat"
                 className="text-gray-400 hover:text-cyan-400 transition-colors duration-200 transform hover:scale-110"
                 aria-label="LinkedIn"
               >
                 <Linkedin size={24} />
               </a>
-              <a 
-                href="mailto:crahat4@gmail.com" 
+              <a
+                  target="_blank"
+                href="mailto:crahat4@gmail.com"
                 className="text-gray-400 hover:text-cyan-400 transition-colors duration-200 transform hover:scale-110"
                 aria-label="Email"
               >
@@ -42,9 +45,9 @@ const Footer = () => {
               </a>
             </div>
           </div>
-          
+
           <div className="border-t border-slate-700 mt-8 pt-8 text-center">
-            <p 
+            <p
               className="text-gray-400 flex items-center justify-center space-x-1"
               data-aos="fade-in"
               data-aos-delay="600"

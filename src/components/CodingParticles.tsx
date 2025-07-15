@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 interface Particle {
   id: number;
@@ -13,7 +13,8 @@ interface Particle {
 const CodingParticles = () => {
   const [particles, setParticles] = useState<Particle[]>([]);
 
-  const codingChars = ['<', '>', '{', '}', '(', ')', ';', '=', '+', '-', '*', '/', '&', '|', '!', '?', '0', '1'];
+  const codingChars = ['<', '>', '{', '}', '(', ')', ';', '=', '+', '-', '*', '/', '&', '|', '!', '?', '0', '1',
+  ];
 
   useEffect(() => {
     // Initialize particles
@@ -23,7 +24,7 @@ const CodingParticles = () => {
       y: Math.random() * window.innerHeight,
       char: codingChars[Math.floor(Math.random() * codingChars.length)],
       opacity: 0.1 + Math.random() * 0.3,
-      speed: 0.5 + Math.random() * 1,
+      speed: 0.5 + Math.random(),
       size: 12 + Math.random() * 8,
     }));
     setParticles(initialParticles);
@@ -36,7 +37,7 @@ const CodingParticles = () => {
           let newY = particle.y - particle.speed;
           let newOpacity = particle.opacity;
 
-          // Reset particle when it goes off screen
+          // Reset particle when it goes off-screen
           if (newY < -20) {
             newY = window.innerHeight + 20;
             newOpacity = 0.1 + Math.random() * 0.3;

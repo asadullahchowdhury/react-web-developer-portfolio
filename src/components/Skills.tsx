@@ -1,10 +1,10 @@
-import React from 'react';
 
 const Skills = () => {
   const skillCategories = [
     {
       title: 'Frontend',
       skills: [
+        { name: 'Angular', level: 95 },
         { name: 'React', level: 95 },
         { name: 'TypeScript', level: 90 },
         { name: 'Next.js', level: 85 },
@@ -15,6 +15,7 @@ const Skills = () => {
     {
       title: 'Backend',
       skills: [
+        { name: 'laravel', level: 95 },
         { name: 'Node.js', level: 88 },
         { name: 'Python', level: 85 },
         { name: 'PostgreSQL', level: 82 },
@@ -26,10 +27,11 @@ const Skills = () => {
       title: 'Tools & Others',
       skills: [
         { name: 'Git', level: 90 },
+        { name: 'Figma', level: 86 },
         { name: 'Docker', level: 80 },
         { name: 'AWS', level: 75 },
         { name: 'Jest', level: 85 },
-        { name: 'Figma', level: 70 },
+        { name: 'Nginx', level: 85 },
       ]
     }
   ];
@@ -38,23 +40,23 @@ const Skills = () => {
     <section id="skills" className="py-20 bg-slate-900">
       <div className="container mx-auto px-6">
         <div className="max-w-6xl mx-auto">
-          <h2 
+          <h2
             className="text-4xl font-bold text-white text-center mb-16"
             data-aos="fade-up"
           >
             My <span className="text-cyan-400">Skills</span>
           </h2>
-          
+
           <div className="grid md:grid-cols-3 gap-8">
             {skillCategories.map((category, categoryIndex) => (
-              <div 
-                key={categoryIndex} 
+              <div
+                key={categoryIndex}
                 className="bg-slate-800 rounded-lg p-6 hover:bg-slate-700 transition-colors duration-300"
                 data-aos="fade-in"
                 data-aos-delay={categoryIndex * 200}
               >
                 <h3 className="text-xl font-bold text-white mb-6 text-center">{category.title}</h3>
-                
+
                 <div className="space-y-4">
                   {category.skills.map((skill, skillIndex) => (
                     <div key={skillIndex}>
@@ -63,7 +65,7 @@ const Skills = () => {
                         <span className="text-cyan-400 text-sm">{skill.level}%</span>
                       </div>
                       <div className="w-full bg-slate-600 rounded-full h-2">
-                        <div 
+                        <div
                           className="bg-gradient-to-r from-cyan-400 to-purple-500 h-2 rounded-full transition-all duration-1000 ease-out"
                           style={{ width: `${skill.level}%` }}
                         ></div>
