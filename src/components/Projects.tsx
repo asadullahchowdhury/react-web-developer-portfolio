@@ -5,7 +5,7 @@ const Projects = () => {
         {
             title: 'EQUIDESK',
             description: 'We partnered with Equidesk to deliver a complete facilities management software solution, covering every aspect from initial concept to successful launch.',
-            image: '/images/equidesk.png',
+            image: '/assets/images/equidesk.png',
             technologies: ['Angular', 'Bootstrap', 'vue', 'Stripe'],
             liveUrl: '#',
             githubUrl: 'https://barberly.thethemeai.com'
@@ -13,7 +13,7 @@ const Projects = () => {
         {
             title: 'Barberly',
             description: 'Barberly is a popular cloud-based barbershop software designed to help barbers and salon owners manage their business more efficiently. Think of it as a digital assistant specifically for barbershops!',
-            image: '/images/barberly.png',
+            image: '/assets/images/barberly.png',
             technologies: ['Vue.js', 'Node.js', 'laravel', 'Stripe'],
             liveUrl: 'https://barberly.thethemeai.com',
             githubUrl: ''

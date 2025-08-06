@@ -30,7 +30,7 @@ const Skills = () => {
         { name: 'Figma', level: 86 },
         { name: 'Docker', level: 80 },
         { name: 'AWS', level: 75 },
-        { name: 'Jest', level: 85 },
+        { name: 'GSAP', level: 85 },
         { name: 'Nginx', level: 85 },
       ]
     }
