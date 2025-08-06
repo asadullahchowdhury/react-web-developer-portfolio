@@ -130,7 +130,7 @@ const Hero = () => {
   };
 
   const handleDownloadResume = () => {
-    const resumeUrl = '/images/resume.pdf';
+    const resumeUrl = 'assets/resume.pdf';
     window.open(resumeUrl, '_blank');
   }
 
