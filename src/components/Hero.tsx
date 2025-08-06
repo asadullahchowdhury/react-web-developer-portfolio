@@ -186,7 +186,7 @@ const Hero = () => {
         <div className="container mx-auto px-6 pt-44 text-center relative z-10">
           <div className="max-w-6xl mx-auto">
             {/* Developer name above title */}
-            <div ref={nameRef} className="mb-6">
+            <div ref={nameRef} className="mb-6 sm:block hidden">
               <p className="text-xl md:text-2xl text-cyan-400 font-medium tracking-wide">
                 Hello, I'm
               </p>
