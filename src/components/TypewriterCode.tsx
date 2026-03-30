@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 const TypewriterCode = () => {
   const [currentCodeIndex, setCurrentCodeIndex] = useState(0);
@@ -6,12 +6,12 @@ const TypewriterCode = () => {
   const [isTyping, setIsTyping] = useState(true);
 
   const codeSnippets = [
-    "const developer = 'Rahat Chowdhury';",
-    "function createAmazingApps() {",
-    "  return innovation + creativity;",
+    "const lead = 'Rahat Chowdhury';",
+    "const stack = ['TypeScript', 'Laravel', 'React'];",
+    "function ship(feature) {",
+    "  return test(feature) && merge(feature);",
     "}",
-    "// Building the future, one line at a time",
-    "export default Excellence;"
+    "// Jashore, BD — open to remote collaboration",
   ];
 
   useEffect(() => {
@@ -43,16 +43,16 @@ const TypewriterCode = () => {
   }, [currentText, isTyping, currentCodeIndex, codeSnippets]);
 
   return (
-    <div className="bg-slate-900/80 backdrop-blur-sm border border-cyan-400/30 rounded-lg p-6 font-mono text-sm max-w-md mx-auto">
+    <div className="ui-card ui-card--interactive mx-auto max-w-md p-6 font-mono text-sm">
       <div className="flex items-center space-x-2 mb-4">
-        <div className="w-3 h-3 bg-red-500 rounded-full"></div>
-        <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
-        <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-        <span className="text-gray-400 text-xs ml-2">terminal</span>
+        <div className="w-3 h-3 bg-foreground-secondary/45 rounded-full"></div>
+        <div className="w-3 h-3 bg-accent/70 rounded-full"></div>
+        <div className="w-3 h-3 bg-foreground-primary/35 rounded-full"></div>
+        <span className="ml-2 text-xs text-foreground-secondary/90">~ console</span>
       </div>
-      <div className="text-cyan-400 min-h-[1.5rem]">
-        <span className="text-purple-400">$</span> {currentText}
-        <span className="animate-pulse">|</span>
+      <div className="text-accent min-h-[1.5rem]">
+        <span className="text-foreground-secondary">$</span> {currentText}
+        <span className="text-foreground-secondary">|</span>
       </div>
     </div>
   );

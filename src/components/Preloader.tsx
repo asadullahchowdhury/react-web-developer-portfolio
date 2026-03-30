@@ -1,24 +1,17 @@
 import { useEffect, useState } from 'react';
-import { Code, Terminal, Zap } from 'lucide-react';
+import { Code } from 'lucide-react';
 
 const Preloader = ({ onComplete }: { onComplete: () => void }) => {
   const [progress, setProgress] = useState(0);
   const [loadingText, setLoadingText] = useState('Initializing...');
 
-  const loadingSteps = [
-    'Initializing...',
-    'Loading components...',
-    'Compiling code...',
-    'Optimizing performance...',
-    'Almost ready...'
-  ];
+  const loadingSteps = ['Loading…', 'Almost there…', 'Welcome.'];
 
   useEffect(() => {
     const interval = setInterval(() => {
       setProgress(prev => {
         const newProgress = prev + Math.random() * 15 + 5;
 
-        // Update loading text based on progress
         const stepIndex = Math.floor((newProgress / 100) * loadingSteps.length);
         if (stepIndex < loadingSteps.length) {
           setLoadingText(loadingSteps[stepIndex]);
@@ -39,62 +32,33 @@ const Preloader = ({ onComplete }: { onComplete: () => void }) => {
   }, [onComplete]);
 
   return (
-    <div className="fixed inset-0 bg-slate-900 z-[9999] flex items-center justify-center">
-      {/* Animated background particles */}
-      <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute top-20 left-20 animate-float-0">
-          <Code className="text-cyan-400/20" size={40} />
-        </div>
-        <div className="absolute top-40 right-32 animate-float-1">
-          <Terminal className="text-purple-400/20" size={35} />
-        </div>
-        <div className="absolute bottom-40 left-32 animate-float-2">
-          <Zap className="text-cyan-400/20" size={30} />
-        </div>
-        <div className="absolute bottom-20 right-20 animate-float-0">
-          <Code className="text-purple-400/20" size={25} />
-        </div>
-      </div>
-
-      <div className="text-center relative z-10">
-        {/* Logo */}
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-background-primary">
+      <div className="relative z-10 text-center">
         <div className="mb-8">
-          <div className="relative inline-block">
-            <div className="w-20 h-20 bg-gradient-to-br from-cyan-400 to-purple-600 rounded-2xl flex items-center justify-center transform rotate-12 animate-pulse">
-              <Code className="text-white" size={40} />
-            </div>
-            <div className="absolute inset-0 bg-gradient-to-br from-cyan-400 to-purple-600 rounded-2xl blur-lg opacity-50 animate-ping"></div>
+          <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-2xl bg-accent shadow-soft">
+            <Code className="text-foreground-primary" size={40} />
           </div>
         </div>
 
-        {/* Name */}
-        <h1 className="text-4xl font-bold text-white mb-4">
-          <span className="text-cyan-400">Rahat</span> Chowdhury
+        <h1 className="mb-4 text-4xl font-bold text-foreground-primary">
+          <span className="text-accent">Rahat</span> Chowdhury
         </h1>
 
-        {/* Loading text */}
-        <p className="text-gray-300 mb-8 font-mono text-lg">{loadingText}</p>
+        <p className="mb-8 font-mono text-lg text-foreground-secondary">{loadingText}</p>
 
-        {/* Progress bar */}
-        <div className="w-80 mx-auto mb-6">
-          <div className="bg-slate-700 rounded-full h-2 overflow-hidden">
+        <div className="mx-auto mb-6 w-full max-w-xs sm:max-w-sm px-4">
+          <div className="h-2 overflow-hidden rounded-full border border-subtle bg-background-secondary">
             <div
-              className="bg-gradient-to-r from-cyan-400 to-purple-600 h-full rounded-full transition-all duration-300 ease-out relative"
+              className="h-full rounded-full bg-accent transition-all duration-300 ease-out"
               style={{ width: `${progress}%` }}
-            >
-              <div className="absolute inset-0 bg-white/20 animate-pulse"></div>
-            </div>
+            />
           </div>
-          <div className="text-cyan-400 text-sm mt-2 font-mono">
+          <div className="mt-2 font-mono text-sm text-foreground-secondary">
             {Math.round(progress)}%
           </div>
         </div>
 
-        {/* Spinning loader */}
-        <div className="relative">
-          <div className="w-12 h-12 border-4 border-slate-600 border-t-cyan-400 rounded-full animate-spin mx-auto"></div>
-          <div className="absolute inset-0 w-12 h-12 border-4 border-transparent border-r-purple-400 rounded-full animate-spin mx-auto" style={{ animationDirection: 'reverse', animationDuration: '1.5s' }}></div>
-        </div>
+        <div className="mx-auto h-10 w-10 rounded-full border-2 border-subtle border-t-accent animate-spin" />
       </div>
     </div>
   );

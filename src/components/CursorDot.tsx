@@ -23,16 +23,13 @@ const CursorDot = () => {
 
   return (
     <div
-      className={`fixed top-0 left-0 w-4 h-4 bg-cyan-400 rounded-full pointer-events-none z-[9999] transition-opacity duration-300 ${
-        isVisible ? 'opacity-70' : 'opacity-0'
+      className={`fixed top-0 left-0 h-3 w-3 rounded-full border border-subtle bg-accent/80 pointer-events-none z-[9999] transition-opacity duration-300 ${
+        isVisible ? 'opacity-60' : 'opacity-0'
       }`}
       style={{
-        transform: `translate(${position.x - 8}px, ${position.y - 8}px)`,
-        boxShadow: '0 0 20px rgba(6, 182, 212, 0.6), 0 0 40px rgba(6, 182, 212, 0.3)',
+        transform: `translate(${position.x - 6}px, ${position.y - 6}px)`,
       }}
-    >
-      <div className="absolute inset-0 bg-cyan-400 rounded-full animate-ping opacity-75"></div>
-    </div>
+    />
   );
 };
 

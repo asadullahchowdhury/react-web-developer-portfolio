@@ -1,13 +1,12 @@
 import { useEffect, useRef } from 'react';
-import { ArrowDown, Github, Linkedin, Mail, Code, Terminal, Zap } from 'lucide-react';
+import { ArrowDown, Github, Linkedin, Mail, Code, Terminal } from 'lucide-react';
 import { gsap } from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { ScrollToPlugin } from 'gsap/ScrollToPlugin';
 import TypewriterCode from './TypewriterCode';
-import CodingParticles from './CodingParticles';
 import CursorDot from './CursorDot';
+import AnimatedBackground from './AnimatedBackground';
 
-gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
+gsap.registerPlugin(ScrollToPlugin);
 
 const Hero = () => {
   const heroRef = useRef<HTMLElement>(null);
@@ -59,9 +58,9 @@ const Hero = () => {
     // Animate code terminal
     if (codeRef.current) {
       tl.fromTo(codeRef.current,
-        { scale: 0.8, opacity: 0, rotationY: -15 },
-        { scale: 1, opacity: 1, rotationY: 0, duration: 0.8, ease: "back.out(1.7)" },
-        "-=0.5"
+        { y: 24, opacity: 0 },
+        { y: 0, opacity: 1, duration: 0.6, ease: 'power2.out' },
+        '-=0.5'
       );
     }
 
@@ -99,23 +98,7 @@ const Hero = () => {
       );
     }
 
-    // GSAP ScrollTrigger for parallax effect
-    if (heroRef.current) {
-      gsap.to(heroRef.current, {
-        yPercent: -50,
-        ease: "none",
-        scrollTrigger: {
-          trigger: heroRef.current,
-          start: "top bottom",
-          end: "bottom top",
-          scrub: true
-        }
-      });
-    }
-
-    return () => {
-      ScrollTrigger.getAll().forEach(trigger => trigger.kill());
-    };
+    return () => {};
   }, []);
 
   const scrollToAbout = () => {
@@ -145,60 +128,30 @@ const Hero = () => {
   return (
     <>
       <CursorDot />
-      <CodingParticles />
 
-      <section id={'hero'}
+      <section
+        id="hero"
         ref={heroRef}
-        className="min-h-screen flex items-center justify-center relative overflow-hidden bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900"
-        style={{ paddingTop: '6rem' }} // Add top spacing from navbar
+        className="relative flex min-h-[100dvh] min-h-screen items-center justify-center overflow-hidden bg-background-primary pt-20 sm:pt-24"
       >
-        {/* Animated background grid */}
-        <div className="absolute inset-0 opacity-20">
-          <div
-            className="absolute inset-0"
-            style={{
-              backgroundImage: `
-                linear-gradient(rgba(6, 182, 212, 0.1) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(6, 182, 212, 0.1) 1px, transparent 1px)
-              `,
-              backgroundSize: '50px 50px',
-              animation: 'grid-move 20s linear infinite',
-            }}
-          ></div>
-        </div>
+        <AnimatedBackground />
 
-        {/* Floating code icons */}
-        <div className="absolute inset-0 pointer-events-none">
-          <Code
-            className="absolute top-20 left-20 text-cyan-400/20 animate-pulse"
-            size={40}
-          />
-          <Terminal
-            className="absolute top-40 right-32 text-purple-400/20 animate-bounce"
-            size={35}
-          />
-          <Zap
-            className="absolute bottom-40 left-32 text-cyan-400/20 animate-pulse"
-            size={30}
-          />
-        </div>
-
-        <div className="container mx-auto px-6 pt-44 text-center relative z-10">
+        <div className="container relative z-10 mx-auto px-6 pt-44 text-center">
           <div className="max-w-6xl mx-auto">
             {/* Developer name above title */}
             <div ref={nameRef} className="mb-6 sm:block hidden">
-              <p className="text-xl md:text-2xl text-cyan-400 font-medium tracking-wide">
+              <p className="text-xl md:text-2xl text-foreground-secondary font-medium tracking-wide">
                 Hello, I'm
               </p>
             </div>
 
             {/* Main heading with character animation */}
-            <div ref={titleRef} className="mb-8">
-              <h1 className="sm:text-6xl text-4xl md:text-8xl font-bold leading-tight mb-4">
-                <div className=" bg-clip-text bg-gradient-to-r text-cyan-400 from-cyan-400 via-purple-400 to-cyan-400 mb-2">
+            <div ref={titleRef} className="mb-6">
+              <h1 className="sm:text-6xl text-4xl md:text-8xl font-extrabold tracking-tight leading-tight mb-3">
+                <div className="text-foreground-primary mb-2">
                   {splitTextIntoChars('Rahat')}
                 </div>
-                <div className=" bg-clip-text bg-gradient-to-r text-purple-400 from-purple-400 via-cyan-400 to-purple-400">
+                <div className="text-foreground-primary">
                   {splitTextIntoChars('Chowdhury')}
                 </div>
               </h1>
@@ -207,17 +160,16 @@ const Hero = () => {
             {/* Subtitle */}
             <p
               ref={subtitleRef}
-              className="text-xl md:text-2xl text-gray-300 mb-12 leading-relaxed"
+              className="mb-10 max-w-2xl mx-auto text-xl text-foreground-secondary md:text-2xl leading-relaxed"
             >
-              Full-Stack Developer crafting exceptional digital experiences
-              <br />
-              <span className="text-cyan-400">with modern technologies</span>
+              Full-stack developer focused on clear UI, solid architecture, and products that stay
+              maintainable after launch.
             </p>
 
             {/* Typewriter code terminal */}
             <div
               ref={codeRef}
-              className="mb-12"
+              className="mb-10"
             >
               <TypewriterCode />
             </div>
@@ -225,7 +177,7 @@ const Hero = () => {
             {/* Action buttons */}
             <div
               ref={buttonsRef}
-              className="flex flex-col sm:flex-row gap-6 justify-center mb-16"
+              className="flex flex-col sm:flex-row gap-6 justify-center mb-14"
             >
               <button
                 onClick={() => {
@@ -238,16 +190,15 @@ const Hero = () => {
                     });
                   }
                 }}
-                className="group relative overflow-hidden bg-gradient-to-r from-cyan-500 to-purple-600 text-white px-8 py-4 rounded-full font-semibold transition-all duration-300 transform hover:scale-105 hover:shadow-2xl hover:shadow-cyan-500/25"
+                className="rounded-full bg-accent px-8 py-4 font-semibold text-foreground-primary shadow-soft transition-colors hover:bg-accent/90"
               >
-                <span className="relative z-10 flex items-center justify-center space-x-2">
+                <span className="flex items-center justify-center space-x-2">
                   <Code size={20} />
-                  <span>View My Work</span>
+                  <span>View work</span>
                 </span>
-                <div className="absolute inset-0 bg-gradient-to-r from-purple-600 to-cyan-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
               </button>
 
-              <button className="group relative border-2 border-cyan-400 text-cyan-400 px-8 py-4 rounded-full font-semibold transition-all duration-300 hover:bg-cyan-400 hover:text-slate-900 hover:shadow-lg hover:shadow-cyan-400/25 transform hover:scale-105"
+              <button className="rounded-full border-2 border-subtle bg-transparent px-8 py-4 font-semibold text-foreground-primary transition-colors hover:border-accent hover:bg-accent/10"
                       onClick={handleDownloadResume}>
                 <span className="relative z-10 flex items-center justify-center space-x-2" >
                   <Terminal size={20} />
@@ -269,12 +220,12 @@ const Hero = () => {
                 <a
                   key={index}
                   href={social.href}
-                  className="group relative p-4 text-gray-400 hover:text-cyan-400 transition-all duration-300 transform hover:scale-125 hover:-translate-y-2"
+                  target={social.href.startsWith('http') ? '_blank' : undefined}
+                  rel={social.href.startsWith('http') ? 'noopener noreferrer' : undefined}
+                  className="p-4 text-foreground-secondary transition-colors hover:text-accent"
                   aria-label={social.label}
                 >
-                  <div className="absolute inset-0 bg-gradient-to-r from-cyan-400/20 to-purple-500/20 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-sm"></div>
-                  <social.icon size={24} className="relative z-10" />
-                  <div className="absolute inset-0 bg-cyan-400/10 rounded-full scale-0 group-hover:scale-150 transition-transform duration-300"></div>
+                  <social.icon size={24} />
                 </a>
               ))}
             </div>
@@ -283,22 +234,14 @@ const Hero = () => {
           {/* Scroll indicator */}
           <button
             onClick={scrollToAbout}
-            className="absolute bottom-8 left-1/2 transform -translate-x-1/2 text-gray-400 hover:text-cyan-400 transition-all duration-300 animate-bounce hover:scale-110 group"
+            className="absolute bottom-8 left-1/2 -translate-x-1/2 text-foreground-secondary transition-colors hover:text-accent"
           >
-            <div className="relative">
+            <div>
               <ArrowDown size={24} />
-              <div className="absolute inset-0 bg-cyan-400/20 rounded-full scale-0 group-hover:scale-150 transition-transform duration-300"></div>
             </div>
           </button>
         </div>
 
-        {/* Glowing accent lines */}
-        <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-cyan-400/50 to-transparent"></div>
-          <div className="absolute bottom-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-purple-400/50 to-transparent"></div>
-          <div className="absolute top-0 left-0 w-px h-full bg-gradient-to-b from-transparent via-cyan-400/30 to-transparent"></div>
-          <div className="absolute top-0 right-0 w-px h-full bg-gradient-to-b from-transparent via-purple-400/30 to-transparent"></div>
-        </div>
       </section>
     </>
   );

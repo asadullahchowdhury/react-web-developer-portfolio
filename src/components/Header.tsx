@@ -11,9 +11,11 @@ const Header = () => {
 
   useEffect(() => {
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 50);
+      const nextScrolled = window.scrollY > 12;
+      setIsScrolled(prev => (prev !== nextScrolled ? nextScrolled : prev));
     };
     window.addEventListener('scroll', handleScroll);
+    handleScroll();
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
@@ -30,24 +32,30 @@ const Header = () => {
   };
 
   return (
-    <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-      isScrolled ? 'bg-slate-900/95 backdrop-blur-sm shadow-lg' : 'bg-transparent'
+    <header className={`fixed top-0 left-0 right-0 z-50 border-b transition-all duration-300 ${
+      isScrolled
+        ? 'border-subtle bg-background-primary/96 shadow-soft backdrop-blur'
+        : 'border-transparent bg-background-primary/30'
     }`}>
-      <nav className="container mx-auto px-6 py-4">
+      <nav className="relative container mx-auto px-6 py-4">
         <div className="flex items-center justify-between">
-          {/* Logo */}
-          <div className="flex items-center space-x-3">
-            <div className="relative">
-              <div className="w-10 h-10 bg-gradient-to-br from-cyan-400 to-purple-600 rounded-lg flex items-center justify-center transform hover:rotate-12 transition-transform duration-300">
-                <Code className="text-white" size={20} />
+          {/* Logo + wordmark (wordmark hidden on small screens to avoid duplicating hero heading) */}
+          <button
+            type="button"
+            onClick={() => scrollToSection('hero')}
+            className="flex items-center space-x-3 text-2xl font-bold text-left rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-background-primary"
+            aria-label="Rahat Chowdhury — scroll to top"
+          >
+            <div className="relative shrink-0">
+              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-accent transition-transform duration-300 hover:rotate-6">
+                <Code className="text-foreground-primary" size={20} />
               </div>
-              <div className="absolute inset-0 bg-gradient-to-br from-cyan-400 to-purple-600 rounded-lg blur-sm opacity-50 animate-pulse"></div>
             </div>
-            <button type={"button"} onClick={() => scrollToSection('hero')} className="text-2xl font-bold">
-              <span className="text-cyan-400">Rahat</span>
-              <span className="text-white"> Chowdhury</span>
-            </button>
-          </div>
+            <span className="hidden md:inline">
+              <span className="text-accent">Rahat</span>
+              <span className="text-foreground-primary"> Chowdhury</span>
+            </span>
+          </button>
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex space-x-8">
@@ -55,19 +63,19 @@ const Header = () => {
               <button
                 key={item}
                 onClick={() => scrollToSection(item.toLowerCase())}
-                className="text-gray-300 hover:text-cyan-400 transition-colors duration-200 font-medium relative group"
+                className="text-foreground-secondary hover:text-accent transition-colors duration-200 font-medium relative group"
                 data-aos="fade-in"
                 data-aos-delay="200"
               >
                 {item}
-                <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-cyan-400 to-purple-600 group-hover:w-full transition-all duration-300"></span>
+                <span className="absolute -bottom-1 left-0 h-0.5 w-0 bg-accent/70 group-hover:w-full transition-all duration-300"></span>
               </button>
             ))}
           </div>
 
           {/* Mobile Menu Button */}
           <button
-            className="md:hidden text-white hover:text-cyan-400 transition-colors duration-200"
+            className="md:hidden text-foreground-primary hover:text-accent transition-colors duration-200"
             onClick={() => setIsMenuOpen(!isMenuOpen)}
           >
             {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
@@ -76,19 +84,29 @@ const Header = () => {
 
         {/* Mobile Navigation */}
         {isMenuOpen && (
-          <div className="md:hidden mt-4 pb-4 border-t border-slate-700">
-            <div className="flex flex-col space-y-4 pt-4">
+          <>
+            <button
+              type="button"
+              aria-label="Close mobile menu backdrop"
+              onClick={() => setIsMenuOpen(false)}
+              className="fixed inset-0 top-[72px] z-40 bg-background-primary/70 md:hidden"
+            />
+            <div className="absolute left-6 right-6 top-full z-50 mt-2 md:hidden">
+              <div className="ui-card rounded-xl border border-subtle bg-background-primary p-4">
+              <div className="flex flex-col space-y-4">
               {['About', 'Skills', 'Projects', 'Experience', 'Contact'].map((item) => (
                 <button
                   key={item}
                   onClick={() => scrollToSection(item.toLowerCase())}
-                  className="text-gray-300 hover:text-cyan-400 transition-colors duration-200 font-medium text-left"
+                  className="text-foreground-secondary hover:text-accent transition-colors duration-200 font-medium text-left"
                 >
                   {item}
                 </button>
               ))}
             </div>
           </div>
+            </div>
+          </>
         )}
       </nav>
     </header>

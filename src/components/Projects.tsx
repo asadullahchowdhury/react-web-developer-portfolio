@@ -6,37 +6,37 @@ const Projects = () => {
             title: 'EQUIDESK',
             description: 'We partnered with Equidesk to deliver a complete facilities management software solution, covering every aspect from initial concept to successful launch.',
             image: '/assets/images/equidesk.png',
-            technologies: ['Angular', 'Bootstrap', 'vue', 'Stripe'],
+            technologies: ['Angular', 'Bootstrap', 'Vue.js', 'Stripe'],
             liveUrl: '#',
-            githubUrl: 'https://barberly.thethemeai.com'
+            githubUrl: ''
         },
         {
             title: 'Barberly',
             description: 'Barberly is a popular cloud-based barbershop software designed to help barbers and salon owners manage their business more efficiently. Think of it as a digital assistant specifically for barbershops!',
             image: '/assets/images/barberly.png',
-            technologies: ['Vue.js', 'Node.js', 'laravel', 'Stripe'],
+            technologies: ['Vue.js', 'Node.js', 'Laravel', 'Stripe'],
             liveUrl: 'https://barberly.thethemeai.com',
             githubUrl: ''
         },
         {
-            title: 'Task Management App',
-            description: 'A collaborative task management application with real-time updates, drag-and-drop functionality, and team collaboration features.',
+            title: 'Task management (concept)',
+            description: 'Exploration of real-time boards, drag-and-drop, and team workflows—stack chosen to mirror production SaaS patterns.',
             image: 'https://images.pexels.com/photos/3184291/pexels-photo-3184291.jpeg?auto=compress&cs=tinysrgb&w=800&h=1200',
             technologies: ['Vue.js', 'Firebase', 'Vuetify', 'Socket.io'],
             liveUrl: '#',
             githubUrl: ''
         },
         {
-            title: 'Weather Dashboard',
-            description: 'A responsive weather dashboard that provides detailed weather information with beautiful visualizations and location-based forecasts.',
+            title: 'Weather dashboard (concept)',
+            description: 'Practice project: location-based forecasts, charts, and a responsive layout built around a public weather API.',
             image: 'https://images.pexels.com/photos/1118873/pexels-photo-1118873.jpeg?auto=compress&cs=tinysrgb&w=800&h=1200',
             technologies: ['React', 'TypeScript', 'Chart.js', 'OpenWeather API'],
             liveUrl: '#',
             githubUrl: ''
         },
         {
-            title: 'Social Media Analytics',
-            description: 'An analytics platform for social media managers to track engagement, analyze trends, and generate comprehensive reports.',
+            title: 'Analytics UI (concept)',
+            description: 'Concept dashboard for engagement metrics and reporting—focused on chart performance and readable data density.',
             image: 'https://images.pexels.com/photos/265087/pexels-photo-265087.jpeg?auto=compress&cs=tinysrgb&w=800&h=1200',
             technologies: ['Next.js', 'Python', 'MongoDB', 'D3.js'],
             liveUrl: '#',
@@ -45,21 +45,21 @@ const Projects = () => {
     ];
 
     return (
-        <section id="projects" className="py-20 bg-slate-800">
+        <section id="projects" className="bg-background-secondary py-20">
             <div className="container mx-auto px-6">
-                <div className="max-w-6xl mx-auto">
+                <div className="mx-auto max-w-6xl">
                     <h2
-                        className="text-4xl font-bold text-white text-center mb-16"
+                        className="mb-16 text-center text-3xl font-bold tracking-tight text-foreground-primary sm:text-4xl"
                         data-aos="fade-up"
                     >
-                        Featured <span className="text-cyan-400">Projects</span>
+                        Selected <span className="text-accent">work</span>
                     </h2>
 
                     <div className="grid md:grid-cols-2 gap-8">
                         {projects.map((project, index) => (
                             <div
                                 key={index}
-                                className="bg-slate-900 rounded-lg overflow-hidden hover:transform hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-cyan-500/25 group"
+                                className="group ui-card ui-card--interactive overflow-hidden"
                                 data-aos="fade-in-right"
                                 data-aos-delay={index * 200}
                             >
@@ -82,19 +82,19 @@ const Projects = () => {
                                         }}
                                     />
                                     <div
-                                        className="absolute inset-0 bg-gradient-to-t from-slate-900/80 to-transparent"></div>
+                                        className="absolute inset-0 bg-gradient-to-t from-background-primary/50 to-transparent" />
                                 </div>
 
                                 <div className="p-6">
                                     <h3
-                                        className="text-xl font-bold text-white mb-3"
+                                        className="text-xl font-bold text-foreground-primary mb-3"
                                         data-aos="fade-in"
                                         data-aos-delay={index * 200 + 100}
                                     >
                                         {project.title}
                                     </h3>
                                     <p
-                                        className="text-gray-300 mb-4 leading-relaxed"
+                                        className="mb-4 text-base leading-relaxed text-foreground-secondary"
                                         data-aos="fade-in-left"
                                         data-aos-delay={index * 200 + 200}
                                     >
@@ -105,7 +105,7 @@ const Projects = () => {
                                         {project.technologies.map((tech, techIndex) => (
                                             <span
                                                 key={techIndex}
-                                                className="bg-slate-700 text-cyan-400 px-3 py-1 rounded-full text-sm font-medium hover:bg-slate-600 transition-colors duration-200"
+                                                className="ui-chip text-accent px-3 py-1 text-sm font-medium transition-colors hover:bg-accent/10"
                                                 data-aos="fade-in"
                                                 data-aos-delay={index * 200 + 300 + techIndex * 50}
                                             >
@@ -117,24 +117,29 @@ const Projects = () => {
                                     <div className="flex space-x-4">
                                         <a
                                             href={project.liveUrl}
-                                            className="flex items-center space-x-2 text-cyan-400 hover:text-cyan-300 transition-colors duration-200 group/link"
+                                            {...(project.liveUrl.startsWith('http')
+                                              ? { target: '_blank', rel: 'noopener noreferrer' }
+                                              : {})}
+                                            className="flex items-center space-x-2 text-accent hover:text-foreground-primary transition-colors duration-200 group/link"
                                             data-aos="fade-in"
                                             data-aos-delay={index * 200 + 400}
                                         >
                                             <ExternalLink size={16}
-                                                          className="group-hover/link:scale-110 transition-transform duration-200"/>
+                                                          className="transition-transform duration-200 group-hover/link:scale-105"/>
                                             <span>Live Demo</span>
                                         </a>
                                         {project.githubUrl !== ''
                                             ? (
                                                 <a
                                                     href={project.githubUrl}
-                                                    className="flex items-center space-x-2 text-gray-400 hover:text-white transition-colors duration-200 group/link"
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="flex items-center space-x-2 text-foreground-secondary hover:text-foreground-primary transition-colors duration-200 group/link"
                                                     data-aos="fade-in"
                                                     data-aos-delay={index * 200 + 450}
                                                 >
                                                     <Github size={16}
-                                                            className="group-hover/link:scale-110 transition-transform duration-200"/>
+                                                            className="transition-transform duration-200 group-hover/link:scale-105"/>
                                                     <span>Code</span>
                                                 </a>
                                             ) : ('')}
