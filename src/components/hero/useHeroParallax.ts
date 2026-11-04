@@ -1,8 +1,8 @@
 import { type RefObject, useEffect } from 'react';
-import { hasFinePointer, isMobileLike, prefersReducedMotion } from '../../lib/capabilities';
 import { gsap } from '../../lib/motion';
 import { type SpringState, SPRING_OMEGA, SPRING_OMEGA_RELEASE, springSettled, springStep } from '../../lib/spring';
 import { sceneState } from './scene/sceneState';
+import type { SceneMode } from './useSceneMode';
 
 /** DOM layer offsets in px per unit of pointer (spec §10). */
 const LAYERS = [
@@ -23,12 +23,14 @@ const SCROLL_FADE_END = 0.35;
  * scroll, and published to `sceneState.pointer` for the 3D scene. The DOM
  * layers are moved here, so they work even without WebGL.
  */
-export function useHeroParallax(scope: RefObject<HTMLElement>) {
+export function useHeroParallax(scope: RefObject<HTMLElement>, mode: SceneMode) {
+  const enabled = !mode.mobile && mode.finePointer && !mode.reducedMotion;
+
   useEffect(() => {
     const root = scope.current;
     // Off on mobile (below 768px or coarse pointer, spec §12), without a
     // hover-capable fine pointer, and with reduced motion
-    if (!root || isMobileLike() || !hasFinePointer() || prefersReducedMotion()) return;
+    if (!root || !enabled) return;
 
     const layers = LAYERS.map((l) => ({ ...l, el: root.querySelector<HTMLElement>(l.selector) }));
     const target = { x: 0, y: 0 };
@@ -90,5 +92,5 @@ export function useHeroParallax(scope: RefObject<HTMLElement>) {
       sceneState.pointer.y = 0;
       for (const layer of layers) if (layer.el) layer.el.style.transform = '';
     };
-  }, [scope]);
+  }, [scope, enabled]);
 }

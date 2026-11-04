@@ -51,8 +51,13 @@ const LabCanvas = ({ mobile, reducedMotion, onReady, onContextLost }: LabCanvasP
         toneMapping: ACESFilmicToneMapping,
         outputColorSpace: SRGBColorSpace,
       }}
-      onCreated={({ gl }) => {
+      onCreated={(state) => {
+        const { gl } = state;
         gl.setClearColor(0x000000, 0);
+        if (import.meta.env.DEV) {
+          // Dev-only poster renderer; tree-shaken from production builds
+          import('./devCapture').then((m) => m.attachDevCapture(state));
+        }
         gl.domElement.addEventListener(
           'webglcontextlost',
           (event) => {

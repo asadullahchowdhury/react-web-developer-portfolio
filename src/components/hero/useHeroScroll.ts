@@ -1,8 +1,8 @@
 import { type RefObject, useEffect } from 'react';
-import { isMobileLike, prefersReducedMotion } from '../../lib/capabilities';
 import { gsap } from '../../lib/motion';
-import { registerScrollTarget, ScrollTrigger } from '../../lib/scroll';
+import { loadScrollLibs, registerScrollTarget, scrollToPosition } from '../../lib/scroll';
 import { sceneState } from './scene/sceneState';
+import type { SceneMode } from './useSceneMode';
 
 /** Hero pin length as a multiple of the viewport height (spec §11.1). */
 const PIN_VH = 2.2;
@@ -27,82 +27,114 @@ const SCRUB = 0.6;
  *
  * Mobile / coarse pointer: no pin; the scene fades as the hero leaves (§12).
  * Reduced motion: no pin and no scroll animation (§13).
+ * Re-runs when the mode changes (window crosses 768px, motion setting).
  */
-export function useHeroScroll(scope: RefObject<HTMLElement>, runwayRef: RefObject<HTMLElement>) {
+export function useHeroScroll(
+  scope: RefObject<HTMLElement>,
+  runwayRef: RefObject<HTMLElement>,
+  mode: SceneMode,
+) {
+  const { mobile, reducedMotion } = mode;
+
   useEffect(() => {
     const root = scope.current;
     const runway = runwayRef.current;
-    if (!root || !runway || prefersReducedMotion()) return;
+    if (!root || !runway || reducedMotion) return;
 
-    // Poster layer in the stage, plus the hero-wide canvas layer on desktop
-    const sceneLayers = Array.from(root.querySelectorAll<HTMLElement>('[data-scene-layer]'));
+    let cancelled = false;
+    let teardown = () => {};
 
-    // Mobile: no pin. Fade the scene as the hero scrolls away.
-    if (isMobileLike()) {
+    loadScrollLibs().then(({ ScrollTrigger }) => {
+      if (cancelled) return;
+
+      // Poster layer in the stage, plus the hero-wide canvas layer on desktop
+      const sceneLayers = Array.from(root.querySelectorAll<HTMLElement>('[data-scene-layer]'));
+
+      // Mobile: no pin. Fade the scene as the hero scrolls away.
+      if (mobile) {
+        const ctx = gsap.context(() => {
+          if (!sceneLayers.length) return;
+          gsap.to(sceneLayers, {
+            opacity: 0.15,
+            ease: 'none',
+            scrollTrigger: { trigger: root, start: 'top top', end: 'bottom top', scrub: true },
+          });
+        }, root);
+        teardown = () => ctx.revert();
+        return;
+      }
+
+      const pinLength = () => window.innerHeight * PIN_VH;
+      // A hero taller than the viewport (short laptop screens; the desktop
+      // hero is at least 760px) pins once its bottom reaches the viewport
+      // bottom, so the whole hero is seen before the pin holds it.
+      const tallHero = () => root.offsetHeight > window.innerHeight;
+      const pinStartOffset = () => Math.max(0, root.offsetHeight - window.innerHeight);
+      // Runway so that #projects reaches the top exactly at the end of the pin:
+      // projectsTop = heroHeight + runway = pinStart + pinLength
+      const setRunway = () => {
+        runway.style.height = `${Math.max(0, pinStartOffset() + pinLength() - root.offsetHeight)}px`;
+      };
+      setRunway();
+      ScrollTrigger.addEventListener('refreshInit', setRunway);
+
+      let unregister = () => {};
+      let pinStart = () => 0;
+
       const ctx = gsap.context(() => {
-        if (!sceneLayers.length) return;
-        gsap.to(sceneLayers, {
-          opacity: 0.15,
-          ease: 'none',
-          scrollTrigger: { trigger: root, start: 'top top', end: 'bottom top', scrub: true },
+        const q = (sel: string) => root.querySelectorAll<HTMLElement>(sel);
+        const tl = gsap.timeline({
+          defaults: { ease: 'none' },
+          scrollTrigger: {
+            trigger: root,
+            start: () => (tallHero() ? 'bottom bottom' : 'top top'),
+            end: () => `+=${pinLength()}`,
+            pin: true,
+            pinSpacing: false,
+            scrub: SCRUB,
+            invalidateOnRefresh: true,
+          },
+          onUpdate: () => {
+            sceneState.scrollProgress = tl.progress();
+          },
         });
+
+        tl.to(q('[data-hero-copy]'), { opacity: 0, y: -40, duration: 0.35 }, 0)
+          .to(q('[data-hud-fade]'), { opacity: 0, duration: 0.35 }, 0)
+          .to(q('[data-panel="deploy"]'), { scale: 1.15, xPercent: -60, yPercent: 40, opacity: 0, duration: 0.45 }, 0.35)
+          .to(q('[data-panel="schema"]'), { scale: 1.15, xPercent: 60, yPercent: -40, opacity: 0, duration: 0.45 }, 0.35)
+          .to(q('[data-hud-chapter="current"]'), { opacity: 0, duration: 0.04 }, 0.8)
+          .to(q('[data-hud-chapter="next"]'), { opacity: 1, duration: 0.04 }, 0.8);
+        if (sceneLayers.length) tl.to(sceneLayers, { opacity: 0.15, duration: 0.2 }, 0.8);
+        tl.set({}, {}, 1); // timeline spans exactly p 0 → 1
+
+        pinStart = () => tl.scrollTrigger?.start ?? 0;
+        // "Enter the lab" and nav "Work" land at the end of the pin (§11.3)
+        unregister = registerScrollTarget('projects', () => tl.scrollTrigger?.end ?? 0);
       }, root);
-      return () => ctx.revert();
-    }
 
-    const pinLength = () => window.innerHeight * PIN_VH;
-    // A hero taller than the viewport (short laptop screens; the desktop
-    // hero is at least 760px) pins once its bottom reaches the viewport
-    // bottom, so the whole hero is seen before the pin holds it.
-    const tallHero = () => root.offsetHeight > window.innerHeight;
-    const pinStartOffset = () => Math.max(0, root.offsetHeight - window.innerHeight);
-    // Runway so that #projects reaches the top exactly at the end of the pin:
-    // projectsTop = heroHeight + runway = pinStart + pinLength
-    const setRunway = () => {
-      runway.style.height = `${Math.max(0, pinStartOffset() + pinLength() - root.offsetHeight)}px`;
-    };
-    setRunway();
-    ScrollTrigger.addEventListener('refreshInit', setRunway);
+      // Keyboard: the pinned copy is faded out mid-pin, so tabbing into it
+      // returns to the start of the pin where it is fully visible (§13).
+      const onFocusIn = (e: FocusEvent) => {
+        if (!(e.target instanceof Element) || !e.target.closest('[data-hero-copy]')) return;
+        if (window.scrollY > pinStart() + 2) scrollToPosition(pinStart(), { immediate: true });
+      };
+      root.addEventListener('focusin', onFocusIn);
 
-    let unregister = () => {};
-
-    const ctx = gsap.context(() => {
-      const q = (sel: string) => root.querySelectorAll<HTMLElement>(sel);
-      const tl = gsap.timeline({
-        defaults: { ease: 'none' },
-        scrollTrigger: {
-          trigger: root,
-          start: () => (tallHero() ? 'bottom bottom' : 'top top'),
-          end: () => `+=${pinLength()}`,
-          pin: true,
-          pinSpacing: false,
-          scrub: SCRUB,
-          invalidateOnRefresh: true,
-        },
-        onUpdate: () => {
-          sceneState.scrollProgress = tl.progress();
-        },
-      });
-
-      tl.to(q('[data-hero-copy]'), { opacity: 0, y: -40, duration: 0.35 }, 0)
-        .to(q('[data-hud-fade]'), { opacity: 0, duration: 0.35 }, 0)
-        .to(q('[data-panel="deploy"]'), { scale: 1.15, xPercent: -60, yPercent: 40, opacity: 0, duration: 0.45 }, 0.35)
-        .to(q('[data-panel="schema"]'), { scale: 1.15, xPercent: 60, yPercent: -40, opacity: 0, duration: 0.45 }, 0.35)
-        .to(q('[data-hud-chapter="current"]'), { opacity: 0, duration: 0.04 }, 0.8)
-        .to(q('[data-hud-chapter="next"]'), { opacity: 1, duration: 0.04 }, 0.8);
-      if (sceneLayers.length) tl.to(sceneLayers, { opacity: 0.15, duration: 0.2 }, 0.8);
-      tl.set({}, {}, 1); // timeline spans exactly p 0 → 1
-
-      // "Enter the lab" and nav "Work" land at the end of the pin (§11.3)
-      unregister = registerScrollTarget('projects', () => tl.scrollTrigger?.end ?? 0);
-    }, root);
+      teardown = () => {
+        root.removeEventListener('focusin', onFocusIn);
+        unregister();
+        ScrollTrigger.removeEventListener('refreshInit', setRunway);
+        ctx.revert();
+        runway.style.height = '0px';
+        sceneState.scrollProgress = 0;
+      };
+      ScrollTrigger.refresh();
+    });
 
     return () => {
-      unregister();
-      ScrollTrigger.removeEventListener('refreshInit', setRunway);
-      ctx.revert();
-      runway.style.height = '0px';
-      sceneState.scrollProgress = 0;
+      cancelled = true;
+      teardown();
     };
-  }, [scope, runwayRef]);
+  }, [scope, runwayRef, mobile, reducedMotion]);
 }

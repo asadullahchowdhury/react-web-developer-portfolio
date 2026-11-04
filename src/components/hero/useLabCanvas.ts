@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
-import { getSceneCapabilities } from '../../lib/capabilities';
+import { supportsWebGL } from '../../lib/capabilities';
+import type { SceneMode } from './useSceneMode';
 
 /**
  * poster  — first paint; only the static poster is shown
@@ -53,14 +54,11 @@ function afterLoadAndIdle(callback: () => void): () => void {
 }
 
 /** Lazy 3D canvas lifecycle (spec §13): load after first paint, fall back to the poster. */
-export function useLabCanvas(): LabCanvasControl {
+export function useLabCanvas(mode: SceneMode): LabCanvasControl {
   const [state, setState] = useState<CanvasState>('poster');
-  const [caps, setCaps] = useState({ mobile: false, reducedMotion: false });
 
   useEffect(() => {
-    const c = getSceneCapabilities();
-    setCaps({ mobile: c.mobile, reducedMotion: c.reducedMotion });
-    if (!c.webgl) {
+    if (!supportsWebGL()) {
       setState('failed');
       return;
     }
@@ -72,13 +70,13 @@ export function useLabCanvas(): LabCanvasControl {
 
   return {
     state,
-    mobile: caps.mobile,
-    reducedMotion: caps.reducedMotion,
+    mobile: mode.mobile,
+    reducedMotion: mode.reducedMotion,
     // Same conditions as the hero pin (useHeroScroll): no dolly, no overflow
-    expanded: !caps.mobile && !caps.reducedMotion,
+    expanded: !mode.mobile && !mode.reducedMotion,
     showCanvas: state === 'loading' || state === 'ready',
     canvasVisible: state === 'ready',
-    fadeMs: caps.reducedMotion ? 200 : 300,
+    fadeMs: mode.reducedMotion ? 200 : 300,
     onReady,
     onFailure,
   };

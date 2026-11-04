@@ -8,6 +8,7 @@ import { useHeroIntro } from './useHeroIntro';
 import { useHeroParallax } from './useHeroParallax';
 import { useHeroScroll } from './useHeroScroll';
 import { useLabCanvas } from './useLabCanvas';
+import { useSceneMode } from './useSceneMode';
 
 /**
  * Hero — "Rahat's Digital Lab" (hero-redesign-spec §2–3, §9–11).
@@ -25,10 +26,11 @@ const Hero = () => {
   const sectionRef = useRef<HTMLElement>(null);
   const runwayRef = useRef<HTMLDivElement>(null);
   const stageRef = useRef<HTMLDivElement>(null);
-  const canvas = useLabCanvas();
+  const mode = useSceneMode();
+  const canvas = useLabCanvas(mode);
   useHeroIntro(sectionRef);
-  useHeroParallax(sectionRef);
-  useHeroScroll(sectionRef, runwayRef);
+  useHeroParallax(sectionRef, mode);
+  useHeroScroll(sectionRef, runwayRef, mode);
 
   return (
     <>
