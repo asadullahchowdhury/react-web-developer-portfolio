@@ -54,7 +54,7 @@ const Header = () => {
         <a
           href="#hero"
           onClick={(e) => scrollToSection(e, 'hero')}
-          className="flex items-center gap-3 rounded-lg"
+          className="flex min-h-11 items-center gap-3 rounded-lg"
           aria-label="Rahat Chowdhury — back to top"
         >
           <span

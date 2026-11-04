@@ -6,11 +6,12 @@
 const media = (query: string) =>
   typeof window !== 'undefined' && window.matchMedia(query).matches;
 
-export const prefersReducedMotion = () => media('(prefers-reduced-motion: reduce)');
-
-/** Dev-only URL overrides for testing, e.g. `?webgl=0` or `?mobile=0`. */
+/** Dev-only URL overrides for testing, e.g. `?webgl=0`, `?mobile=0`, `?motion=reduce`. */
 const devOverride = (key: string): string | null =>
   import.meta.env.DEV ? new URLSearchParams(window.location.search).get(key) : null;
+
+export const prefersReducedMotion = () =>
+  devOverride('motion') === 'reduce' || media('(prefers-reduced-motion: reduce)');
 
 /** Mobile rules apply below 768px or on coarse pointers (spec §12). */
 export const isMobileLike = () => {
