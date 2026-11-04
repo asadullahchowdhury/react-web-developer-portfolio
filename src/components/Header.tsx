@@ -1,9 +1,6 @@
 import { useEffect, useState, type MouseEvent } from 'react';
 import { Menu, X } from 'lucide-react';
-import { gsap } from 'gsap';
-import { ScrollToPlugin } from 'gsap/ScrollToPlugin';
-
-gsap.registerPlugin(ScrollToPlugin);
+import { scrollToId } from '../lib/scroll';
 
 /** Nav per hero-redesign-spec §2.2. Scroll targets become pin-aware in the scroll step. */
 const NAV_ITEMS = [
@@ -37,16 +34,8 @@ const Header = () => {
   }, [isMenuOpen]);
 
   const scrollToSection = (e: MouseEvent<HTMLAnchorElement>, sectionId: string) => {
-    const element = document.getElementById(sectionId);
     setIsMenuOpen(false);
-    if (!element) return;
-    e.preventDefault();
-    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    gsap.to(window, {
-      duration: reduceMotion ? 0 : 1.2,
-      scrollTo: element,
-      ease: 'power2.inOut',
-    });
+    if (scrollToId(sectionId)) e.preventDefault();
   };
 
   return (
