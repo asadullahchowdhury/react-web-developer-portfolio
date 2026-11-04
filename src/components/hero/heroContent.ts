@@ -26,6 +26,8 @@ export const heroCopy = {
 export const heroHud = {
   desktop: {
     chapter: '01 / 04',
+    /** Shown once the hero hands off to Work (spec §11.1). */
+    chapterNext: '02 / 04',
     status: 'Jashore, BD · Open to product work & freelance',
   },
   mobile: {

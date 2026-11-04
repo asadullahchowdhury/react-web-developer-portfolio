@@ -77,31 +77,34 @@ const HeroStage = () => {
       data-canvas-state={canvasState}
       className="relative -mt-1.5 h-[330px] w-full md:mx-auto md:mt-0 md:aspect-square md:h-auto md:max-w-[520px] lg:mr-0 lg:max-w-[560px] xl:max-w-[680px]"
     >
-      <div
-        className="absolute inset-0 transition-opacity ease-linear"
-        style={{ opacity: canvasVisible ? 0 : 1, transitionDuration: `${fadeMs}ms` }}
-      >
-        <ScenePoster />
-      </div>
-
-      {showCanvas && (
+      {/* Scene layer: faded as a whole by the scroll hand-off */}
+      <div data-scene-layer className="absolute inset-0">
         <div
           className="absolute inset-0 transition-opacity ease-linear"
-          style={{ opacity: canvasVisible ? 1 : 0, transitionDuration: `${fadeMs}ms` }}
+          style={{ opacity: canvasVisible ? 0 : 1, transitionDuration: `${fadeMs}ms` }}
         >
-          <SceneErrorBoundary onError={handleFailure}>
-            <Suspense fallback={null}>
-              <LabCanvas
-                mobile={mobile}
-                reducedMotion={reducedMotion}
-                onReady={handleReady}
-                onContextLost={handleFailure}
-              />
-            </Suspense>
-          </SceneErrorBoundary>
-          <NodeLabels />
+          <ScenePoster />
         </div>
-      )}
+
+        {showCanvas && (
+          <div
+            className="absolute inset-0 transition-opacity ease-linear"
+            style={{ opacity: canvasVisible ? 1 : 0, transitionDuration: `${fadeMs}ms` }}
+          >
+            <SceneErrorBoundary onError={handleFailure}>
+              <Suspense fallback={null}>
+                <LabCanvas
+                  mobile={mobile}
+                  reducedMotion={reducedMotion}
+                  onReady={handleReady}
+                  onContextLost={handleFailure}
+                />
+              </Suspense>
+            </SceneErrorBoundary>
+            <NodeLabels />
+          </div>
+        )}
+      </div>
 
       <p className="sr-only">{heroCopy.sceneDescription}</p>
 

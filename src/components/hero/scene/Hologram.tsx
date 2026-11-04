@@ -1,6 +1,15 @@
 import { useMemo, useRef } from 'react';
 import { useFrame, useLoader } from '@react-three/fiber';
-import { AdditiveBlending, Color, DoubleSide, type Mesh, ShaderMaterial, SRGBColorSpace, TextureLoader } from 'three';
+import {
+  AdditiveBlending,
+  Color,
+  DoubleSide,
+  MathUtils,
+  type Mesh,
+  ShaderMaterial,
+  SRGBColorSpace,
+  TextureLoader,
+} from 'three';
 import { COLORS, WORLD } from './config';
 import { sceneState } from './sceneState';
 import { hologramFragment, hologramVertex } from './shaders/hologram';
@@ -8,6 +17,7 @@ import { hologramFragment, hologramVertex } from './shaders/hologram';
 const MASK_SIZE = 1024;
 const HOLOGRAM_YAW = (6 * Math.PI) / 180;
 const HOLOGRAM_PITCH = (3 * Math.PI) / 180;
+const HOLOGRAM_DIMMED = 0.25;
 
 /**
  * Placeholder hologram: a plane that turns to face the camera (yaw only),
@@ -52,6 +62,9 @@ const Hologram = () => {
     const t = clock.elapsedTime;
     u.uPixelRatio.value = viewport.dpr;
     u.uReveal.value = sceneState.intro.reveal;
+    // Dims 0.6 → 0.25 while the panels hand over (scroll p 0.35 → 0.80, spec §11.1)
+    const dim = MathUtils.clamp((sceneState.scrollProgress - 0.35) / 0.45, 0, 1);
+    u.uOpacity.value = MathUtils.lerp(WORLD.hologram.opacity, HOLOGRAM_DIMMED, dim);
 
     if (sceneState.motion) {
       // Float ±0.03 units, 6 s sine (spec §9.2)

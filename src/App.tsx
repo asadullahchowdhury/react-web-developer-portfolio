@@ -9,6 +9,7 @@ import Projects from './components/Projects';
 import Experience from './components/Experience';
 import Contact from './components/Contact';
 import Footer from './components/Footer';
+import { initSmoothScroll } from './lib/scroll';
 
 function App() {
   useEffect(() => {
@@ -19,6 +20,8 @@ function App() {
       offset: 120,
       delay: 100,
     });
+    // Pins change the page height, so AOS re-measures after each refresh
+    return initSmoothScroll(() => AOS.refresh());
   }, []);
 
   return (
@@ -26,13 +29,19 @@ function App() {
       <Header />
       <main>
         <Hero />
-        <Projects />
-        <About />
-        <Skills />
-        <Experience />
-        <Contact />
+        {/* Positioned above the pinned hero so Work slides over it at the
+            end of the pin (spec §11.1 hand-off) */}
+        <div className="relative z-10">
+          <Projects />
+          <About />
+          <Skills />
+          <Experience />
+          <Contact />
+        </div>
       </main>
-      <Footer />
+      <div className="relative z-10">
+        <Footer />
+      </div>
     </div>
   );
 }

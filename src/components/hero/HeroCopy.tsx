@@ -10,7 +10,7 @@ const HeroCopy = () => {
   };
 
   return (
-    <div className="flex w-full max-w-[560px] flex-col gap-[18px] md:gap-8">
+    <div data-hero-copy className="flex w-full max-w-[560px] flex-col gap-[18px] md:gap-8">
       <p data-intro="label" className="font-mono text-[11px] uppercase leading-none tracking-[0.14em] text-signal md:text-label">
         {label}
       </p>

@@ -9,6 +9,7 @@ import {
   Line,
   LineBasicMaterial,
   LineSegments,
+  MathUtils,
   Matrix4,
   type Mesh,
   Quaternion,
@@ -26,6 +27,11 @@ const PACKET_SPEED = 0.08;
 const PULSE = { min: 0.7, period: 3 };
 /** Node hover (spec §10): emissive +40%, its orbit segment to 45% opacity. */
 const HOVER = { emissive: 0.4, arcOpacity: 0.45, arcHalfAngle: 16, smoothing: 14 };
+/**
+ * Scroll light-up (spec §11.1): each node lights at its pin progress, in
+ * data-flow order, and the packet path into it brightens.
+ */
+const SCROLL_LIGHT = { at: [0.1, 0.17, 0.24, 0.31], ramp: 0.03, pathOpacity: 0.45 };
 /** Label colour on hover: --text-tertiary → --text-primary. */
 const LABEL_RGB = { rest: [122, 131, 150], hover: [237, 239, 243] } as const;
 
@@ -34,13 +40,13 @@ const LABEL_GAP = { above: 18, below: 24 } as const;
 
 const IDENTITY = new Quaternion();
 
-/** Short arc of the orbit around a node, in the orbit's local plane. */
-function orbitArc(angleDeg: number): Line {
+/** Arc of the orbit from one angle to another, in the orbit's local plane. */
+function orbitArc(fromDeg: number, toDeg: number): Line {
   const { rx, rz } = WORLD.orbit;
   const positions: number[] = [];
-  const steps = 24;
+  const steps = Math.max(8, Math.round(Math.abs(toDeg - fromDeg) / 2));
   for (let k = 0; k <= steps; k++) {
-    const deg = angleDeg - HOVER.arcHalfAngle + (k / steps) * HOVER.arcHalfAngle * 2;
+    const deg = fromDeg + (k / steps) * (toDeg - fromDeg);
     const a = (deg * Math.PI) / 180;
     positions.push(Math.cos(a) * rx, 0, -Math.sin(a) * rz);
   }
@@ -70,7 +76,7 @@ const Orbit = ({ interactive }: { interactive: boolean }) => {
 
   const nodePositions = useMemo(() => NODES.map((n) => orbitPoint(n.angle)), []);
 
-  const { orbitLine, outlines, arcs, boxGeometry } = useMemo(() => {
+  const { orbitLine, outlines, arcs, paths, boxGeometry } = useMemo(() => {
     const line = new Line(
       ellipsePoints(orbit.rx, orbit.rz, orbit.segments),
       new LineBasicMaterial({ color: COLORS.signal, transparent: true, opacity: orbit.opacity, depthWrite: false }),
@@ -96,15 +102,27 @@ const Orbit = ({ interactive }: { interactive: boolean }) => {
     });
 
     const nodeArcs = NODES.map((n) => {
-      const arc = orbitArc(n.angle);
+      const arc = orbitArc(n.angle - HOVER.arcHalfAngle, n.angle + HOVER.arcHalfAngle);
       arc.name = `orbit-arc-${n.id}`;
       return arc;
+    });
+
+    // Data paths: interface → api → services → database runs clockwise
+    // (decreasing angle) on this orbit
+    const dataPaths = NODES.slice(1).map((n, i) => {
+      const from = NODES[i].angle;
+      let to = n.angle;
+      while (to > from) to -= 360;
+      const path = orbitArc(from, to);
+      path.name = `orbit-path-${NODES[i].id}-${n.id}`;
+      return path;
     });
 
     return {
       orbitLine: line,
       outlines: edges,
       arcs: nodeArcs,
+      paths: dataPaths,
       boxGeometry: roundedBoxGeometry(node.size, node.radius),
     };
   }, [orbit, node, nodePositions]);
@@ -133,8 +151,10 @@ const Orbit = ({ interactive }: { interactive: boolean }) => {
     [],
   );
 
+  const lit = useRef<number[]>([0, 0, 0, 0]);
+
   useFrame(({ camera, size, clock }, delta) => {
-    const { intro, motion } = sceneState;
+    const { intro, motion, scrollProgress } = sceneState;
     const t = clock.elapsedTime;
     const step = Math.min(delta, 0.1);
 
@@ -145,8 +165,11 @@ const Orbit = ({ interactive }: { interactive: boolean }) => {
     NODES.forEach((n, i) => {
       const reveal = intro.nodes[n.id];
 
-      // Hover highlight eases toward its goal (instant with reduced motion)
-      const goal = sceneState.hovered === n.id ? 1 : 0;
+      // Lit by scroll (spec §11.1) or hover (§10); eases toward its goal,
+      // instantly with reduced motion
+      const at = SCROLL_LIGHT.at[i];
+      lit.current[i] = MathUtils.smoothstep(scrollProgress, at, at + SCROLL_LIGHT.ramp);
+      const goal = Math.max(sceneState.hovered === n.id ? 1 : 0, lit.current[i]);
       const prev = highlight.current[n.id];
       const h = motion ? prev + (goal - prev) * (1 - Math.exp(-HOVER.smoothing * step)) : goal;
       highlight.current[n.id] = h;
@@ -175,6 +198,13 @@ const Orbit = ({ interactive }: { interactive: boolean }) => {
       arc.visible = h > 0.001;
       (arc.material as LineBasicMaterial).opacity = HOVER.arcOpacity * h;
     });
+    // Path into a node brightens as that node lights up
+    paths.forEach((path, i) => {
+      const glow = lit.current[i + 1];
+      path.visible = glow > 0.001;
+      (path.material as LineBasicMaterial).opacity = SCROLL_LIGHT.pathOpacity * glow;
+    });
+
     for (const mesh of [bodies.current, dots.current]) {
       if (!mesh) continue;
       mesh.instanceMatrix.needsUpdate = true;
@@ -185,7 +215,8 @@ const Orbit = ({ interactive }: { interactive: boolean }) => {
     if (motion && intro.packets > 0) travel.current += step * PACKET_SPEED;
     packetRefs.current.forEach((mesh, i) => {
       if (!mesh) return;
-      orbitPoint(PACKET_ANGLES[i] + travel.current * 360, mesh.position);
+      // Travel in data-flow direction (clockwise, decreasing angle)
+      orbitPoint(PACKET_ANGLES[i] - travel.current * 360, mesh.position);
       mesh.visible = intro.packets > 0;
       mesh.scale.setScalar(Math.max(intro.packets, 0.0001));
     });
@@ -236,8 +267,8 @@ const Orbit = ({ interactive }: { interactive: boolean }) => {
     <group ref={system} name="orbit-system">
       <group position-y={orbit.y} rotation-x={orbit.tilt}>
         <primitive object={orbitLine} />
-        {arcs.map((arc) => (
-          <primitive key={arc.name} object={arc} />
+        {[...arcs, ...paths].map((line) => (
+          <primitive key={line.name} object={line} />
         ))}
       </group>
 
