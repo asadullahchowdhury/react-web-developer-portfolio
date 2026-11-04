@@ -107,12 +107,20 @@ const HeroStage = () => {
 
       {/* Panel A — near layer; tablet and up */}
       <div data-panel="deploy" className="absolute right-0 top-[6%] hidden w-[166px] md:block xl:w-[184px]">
-        <GlassPanel content={deployPanel} />
+        <div data-panel-parallax>
+          <div data-panel-float>
+            <GlassPanel content={deployPanel} />
+          </div>
+        </div>
       </div>
 
       {/* Panel B — far layer; laptop and up */}
       <div data-panel="schema" className="absolute bottom-[4%] left-0 hidden w-[180px] lg:block xl:w-[200px]">
-        <GlassPanel content={schemaPanel} />
+        <div data-panel-parallax>
+          <div data-panel-float>
+            <GlassPanel content={schemaPanel} />
+          </div>
+        </div>
       </div>
     </div>
   );

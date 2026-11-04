@@ -15,6 +15,7 @@ interface GlassPanelProps {
 const GlassPanel = ({ content, className = '' }: GlassPanelProps) => (
   <div
     aria-hidden="true"
+    data-intro="panel"
     className={`rounded-xl border border-subtle bg-glass px-4 py-3.5 font-mono text-panel backdrop-blur-[12px] ${className}`}
   >
     <p className="mb-2.5 text-ink-tertiary">{content.title}</p>

@@ -1,7 +1,9 @@
 import { useMemo } from 'react';
+import { useFrame } from '@react-three/fiber';
 import { AdditiveBlending, Color, Line, LineBasicMaterial, ShaderMaterial } from 'three';
 import { COLORS, WORLD } from './config';
 import { ellipsePoints } from './geometry';
+import { sceneState } from './sceneState';
 
 const padVertex = /* glsl */ `
   varying vec2 vUv;
@@ -54,6 +56,15 @@ const Platform = () => {
 
     return { outer: outerLine, inner: innerLine, padMaterial: glow };
   }, [rings, pad]);
+
+  // Intro: rings draw on, pad glow fades in (spec §9.1)
+  useFrame(() => {
+    const { intro } = sceneState;
+    const points = Math.round(intro.rings * rings.segments) + 1;
+    outer.geometry.setDrawRange(0, intro.rings > 0 ? points : 0);
+    inner.geometry.setDrawRange(0, intro.rings > 0 ? points : 0);
+    padMaterial.uniforms.uOpacity.value = pad.opacity * intro.pad;
+  });
 
   return (
     <group name="platform">

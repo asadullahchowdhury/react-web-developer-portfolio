@@ -1,6 +1,8 @@
-import { useMemo } from 'react';
-import { AdditiveBlending, Color, CylinderGeometry, DoubleSide, ShaderMaterial } from 'three';
+import { useMemo, useRef } from 'react';
+import { useFrame } from '@react-three/fiber';
+import { AdditiveBlending, Color, CylinderGeometry, DoubleSide, type Mesh, ShaderMaterial } from 'three';
 import { COLORS, WORLD } from './config';
+import { sceneState } from './sceneState';
 
 const coneVertex = /* glsl */ `
   varying vec2 vUv;
@@ -28,8 +30,9 @@ const coneFragment = /* glsl */ `
   }
 `;
 
-/** Open light cone rising from the pad (spec §8 #4). Grown from the floor via scale.y. */
+/** Open light cone rising from the pad (spec §8 #4). Grows from the floor via scale.y. */
 const LightCone = () => {
+  const mesh = useRef<Mesh>(null);
   const { bottomRadius, topRadius, height, opacity } = WORLD.cone;
 
   const { geometry, material } = useMemo(() => {
@@ -50,7 +53,14 @@ const LightCone = () => {
     return { geometry: geo, material: mat };
   }, [bottomRadius, topRadius, height, opacity]);
 
-  return <mesh name="light-cone" geometry={geometry} material={material} renderOrder={2} />;
+  useFrame(() => {
+    const grow = sceneState.intro.cone;
+    if (!mesh.current) return;
+    mesh.current.visible = grow > 0;
+    mesh.current.scale.y = Math.max(0.0001, grow);
+  });
+
+  return <mesh ref={mesh} name="light-cone" geometry={geometry} material={material} renderOrder={2} />;
 };
 
 export default LightCone;

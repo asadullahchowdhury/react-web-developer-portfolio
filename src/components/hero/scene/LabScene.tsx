@@ -8,6 +8,7 @@ import Orbit from './Orbit';
 import Platform from './Platform';
 import QualityMonitor from './QualityMonitor';
 import RenderLoop, { type Frameloop } from './RenderLoop';
+import SceneIntro from './SceneIntro';
 import { CAMERA, FOG, LIGHTS } from './config';
 import { sceneState } from './sceneState';
 
@@ -45,6 +46,7 @@ const LabScene = ({ mobile, reducedMotion, onFrameloopChange }: LabSceneProps) =
   return (
     <>
       <RenderLoop animate={!reducedMotion} onChange={onFrameloopChange} />
+      <SceneIntro reducedMotion={reducedMotion} />
       {!reducedMotion && <QualityMonitor onDegrade={degrade} />}
 
       <fog attach="fog" args={[FOG.color, FOG.near, FOG.far]} />

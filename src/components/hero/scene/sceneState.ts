@@ -16,6 +16,19 @@ export const sceneState = {
   quality: 'high' as 'high' | 'low',
   /** True while the bloom pass owns rendering. */
   bloom: false,
+  /** Idle loops run only when true (false with reduced motion). */
+  motion: false,
+  /** 3D intro progress, each 0 → 1 (spec §9.1). Tweened by SceneIntro. */
+  intro: {
+    rings: 0,
+    pad: 0,
+    cone: 0,
+    reveal: 0,
+    orbit: 0,
+    packets: 0,
+    dust: 0,
+    nodes: { interface: 0, api: 0, services: 0, database: 0 } as Record<NodeId, number>,
+  },
 };
 
 // Dev-only handle for inspecting the scene from the browser console

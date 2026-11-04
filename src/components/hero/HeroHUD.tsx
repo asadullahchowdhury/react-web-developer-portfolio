@@ -2,7 +2,7 @@ import { heroHud } from './heroContent';
 
 /** Chapter counter, location/status and scroll cue along the bottom of the hero (spec §2.2, §3.4). */
 const HeroHUD = () => (
-  <div className="flex items-end justify-between gap-4 pb-[18px] pt-4 font-mono text-[10px] uppercase leading-none tracking-[0.12em] text-ink-tertiary md:pb-8 md:pt-6 md:text-hud">
+  <div data-intro="hud" className="flex items-end justify-between gap-4 pb-[18px] pt-4 font-mono text-[10px] uppercase leading-none tracking-[0.12em] text-ink-tertiary md:pb-8 md:pt-6 md:text-hud">
     {/* Mobile */}
     <p className="md:hidden">{heroHud.mobile.chapter}</p>
     <p className="text-right md:hidden">{heroHud.mobile.status}</p>
