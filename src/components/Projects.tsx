@@ -3,9 +3,9 @@ import {ExternalLink, Github} from 'lucide-react';
 const Projects = () => {
     const projects = [
         {
-            title: 'EQUIDESK',
-            description: 'We partnered with Equidesk to deliver a complete facilities management software solution, covering every aspect from initial concept to successful launch.',
-            image: '/assets/images/equidesk.png',
+            title: 'CAFM Platform',
+            description: 'Computer-aided facilities management — assets, work orders and maintenance in one system.',
+            image: '/assets/images/project-placeholder.svg',
             technologies: ['Angular', 'Bootstrap', 'Vue.js', 'Stripe'],
             liveUrl: '#',
             githubUrl: ''
