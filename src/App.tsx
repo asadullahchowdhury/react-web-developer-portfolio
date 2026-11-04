@@ -1,19 +1,17 @@
-import  { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import AOS from 'aos';
 import 'aos/dist/aos.css';
-import Preloader from './components/Preloader';
 import Header from './components/Header';
-import Hero from './components/Hero';
+import Hero from './components/hero/Hero';
 import About from './components/About';
 import Skills from './components/Skills';
 import Projects from './components/Projects';
 import Experience from './components/Experience';
 import Contact from './components/Contact';
 import Footer from './components/Footer';
+import { initSmoothScroll } from './lib/scroll';
 
 function App() {
-  const [isLoading, setIsLoading] = useState(true);
-
   useEffect(() => {
     AOS.init({
       duration: 800,
@@ -22,26 +20,28 @@ function App() {
       offset: 120,
       delay: 100,
     });
+    // Pins change the page height, so AOS re-measures after each refresh
+    return initSmoothScroll(() => AOS.refresh());
   }, []);
-
-  const handleLoadingComplete = () => {
-    setIsLoading(false);
-  };
-
-  if (isLoading) {
-    return <Preloader onComplete={handleLoadingComplete} />;
-  }
 
   return (
     <div className="min-h-screen bg-background-primary">
       <Header />
-      <Hero />
-      <About />
-      <Skills />
-      <Projects />
-      <Experience />
-      <Contact />
-      <Footer />
+      <main>
+        <Hero />
+        {/* Positioned above the pinned hero so Work slides over it at the
+            end of the pin (spec §11.1 hand-off) */}
+        <div className="relative z-10">
+          <Projects />
+          <About />
+          <Skills />
+          <Experience />
+          <Contact />
+        </div>
+      </main>
+      <div className="relative z-10">
+        <Footer />
+      </div>
     </div>
   );
 }

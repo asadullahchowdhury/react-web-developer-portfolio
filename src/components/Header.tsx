@@ -1,114 +1,105 @@
-import { useState, useEffect } from 'react';
-import { Menu, X, Code } from 'lucide-react';
-import { gsap } from 'gsap';
-import { ScrollToPlugin } from 'gsap/ScrollToPlugin';
+import { type MouseEvent, useCallback, useEffect, useRef, useState } from 'react';
+import { scrollToId } from '../lib/scroll';
+import Logo from './brand/Logo';
+import DesktopHeader from './header/DesktopHeader';
+import MobileMenu from './header/MobileMenu';
+import { NAV_ITEMS, SECTION_IDS } from './header/navItems';
+import { useActiveSection } from './header/useActiveSection';
+import { useHeaderScroll } from './header/useHeaderScroll';
+import { useInert } from './header/useInert';
+import { useLocalTime } from './header/useLocalTime';
 
-gsap.registerPlugin(ScrollToPlugin);
-
+/**
+ * Site header: desktop states 1 / 2 (≥ 768 px), mobile floating bar and
+ * full-screen menu (< 768 px).
+ *
+ * The root stays a <header> (the hero intro fades it in) and ignores the
+ * pointer except on its bars, so it never blocks the page underneath.
+ */
 const Header = () => {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isScrolled, setIsScrolled] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const { compact, hidden } = useHeaderScroll(menuOpen);
+  const active = useActiveSection(SECTION_IDS);
+  const time = useLocalTime();
+  const menuButton = useRef<HTMLButtonElement>(null);
+  const mobileBar = useRef<HTMLDivElement>(null);
+  const pendingTarget = useRef<string | null>(null);
+  useInert(mobileBar, menuOpen);
+
+  const closeMenu = useCallback(() => setMenuOpen(false), []);
+
+  // Links: scroll to the section; sections that don't exist yet are a no-op.
+  // From the menu, scroll after it has closed and unlocked page scrolling.
+  const onNavigate = useCallback(
+    (target: string) => (e: MouseEvent<HTMLAnchorElement>) => {
+      e.preventDefault();
+      if (menuOpen) {
+        pendingTarget.current = target;
+        setMenuOpen(false);
+      } else {
+        scrollToId(target);
+      }
+    },
+    [menuOpen],
+  );
 
   useEffect(() => {
-    const handleScroll = () => {
-      const nextScrolled = window.scrollY > 12;
-      setIsScrolled(prev => (prev !== nextScrolled ? nextScrolled : prev));
-    };
-    window.addEventListener('scroll', handleScroll);
-    handleScroll();
-    return () => window.removeEventListener('scroll', handleScroll);
+    if (menuOpen || !pendingTarget.current) return;
+    scrollToId(pendingTarget.current);
+    pendingTarget.current = null;
+  }, [menuOpen]);
+
+  // The menu is mobile-only: close it if the window grows past 768 px
+  useEffect(() => {
+    const desktop = window.matchMedia('(min-width: 768px)');
+    const onChange = () => desktop.matches && setMenuOpen(false);
+    desktop.addEventListener('change', onChange);
+    return () => desktop.removeEventListener('change', onChange);
   }, []);
 
-  const scrollToSection = (sectionId: string) => {
-    const element = document.getElementById(sectionId);
-    if (element) {
-      gsap.to(window, {
-        duration: 1.5,
-        scrollTo: element,
-        ease: "power2.inOut"
-      });
-      setIsMenuOpen(false);
-    }
-  };
+  const current = NAV_ITEMS.find((i) => i.target === active) ?? NAV_ITEMS[0];
 
   return (
-    <header className={`fixed top-0 left-0 right-0 z-50 border-b transition-all duration-300 ${
-      isScrolled
-        ? 'border-subtle bg-background-primary/96 shadow-soft backdrop-blur'
-        : 'border-transparent bg-background-primary/30'
-    }`}>
-      <nav className="relative container mx-auto px-6 py-4">
-        <div className="flex items-center justify-between">
-          {/* Logo + wordmark (wordmark hidden on small screens to avoid duplicating hero heading) */}
+    <header className="pointer-events-none fixed inset-x-0 top-0 z-50">
+      <DesktopHeader compact={compact} hidden={hidden} active={active} time={time} onNavigate={onNavigate} />
+
+      {/* Mobile floating bar */}
+      <div
+        ref={mobileBar}
+        className={`pointer-events-auto absolute inset-x-3 top-2.5 transition-[opacity,transform] duration-300 ease-lab motion-reduce:transition-none md:hidden ${
+          hidden ? '-translate-y-[140%] opacity-0' : 'translate-y-0 opacity-100'
+        }`}
+      >
+        <div className="flex h-14 items-center justify-between gap-3 rounded-full border border-subtle bg-void/70 pl-4 pr-1.5 backdrop-blur-xl">
+          <a href="#hero" onClick={onNavigate('hero')} aria-label="Rahat Chowdhury — home" className="rounded-md">
+            <Logo variant="short" size={22} animate />
+          </a>
+          <span aria-hidden="true" className="truncate font-mono text-[11px] uppercase tracking-[0.12em] text-ink-tertiary">
+            {current.number} · {current.label}
+          </span>
           <button
+            ref={menuButton}
             type="button"
-            onClick={() => scrollToSection('hero')}
-            className="flex items-center space-x-3 text-2xl font-bold text-left rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-background-primary"
-            aria-label="Rahat Chowdhury — scroll to top"
+            onClick={() => setMenuOpen(true)}
+            aria-haspopup="dialog"
+            aria-expanded={menuOpen}
+            aria-controls="site-menu"
+            className="inline-flex h-11 items-center rounded-full border border-strong px-5 text-[14px] font-medium text-ink-primary"
           >
-            <div className="relative shrink-0">
-              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-accent transition-transform duration-300 hover:rotate-6">
-                <Code className="text-foreground-primary" size={20} />
-              </div>
-            </div>
-            <span className="hidden md:inline">
-              <span className="text-accent">Rahat</span>
-              <span className="text-foreground-primary"> Chowdhury</span>
-            </span>
-          </button>
-
-          {/* Desktop Navigation */}
-          <div className="hidden md:flex space-x-8">
-            {['About', 'Skills', 'Projects', 'Experience', 'Contact'].map((item) => (
-              <button
-                key={item}
-                onClick={() => scrollToSection(item.toLowerCase())}
-                className="text-foreground-secondary hover:text-accent transition-colors duration-200 font-medium relative group"
-                data-aos="fade-in"
-                data-aos-delay="200"
-              >
-                {item}
-                <span className="absolute -bottom-1 left-0 h-0.5 w-0 bg-accent/70 group-hover:w-full transition-all duration-300"></span>
-              </button>
-            ))}
-          </div>
-
-          {/* Mobile Menu Button */}
-          <button
-            className="md:hidden text-foreground-primary hover:text-accent transition-colors duration-200"
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
-          >
-            {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
+            Menu
           </button>
         </div>
+      </div>
 
-        {/* Mobile Navigation */}
-        {isMenuOpen && (
-          <>
-            <button
-              type="button"
-              aria-label="Close mobile menu backdrop"
-              onClick={() => setIsMenuOpen(false)}
-              className="fixed inset-0 top-[72px] z-40 bg-background-primary/70 md:hidden"
-            />
-            <div className="absolute left-6 right-6 top-full z-50 mt-2 md:hidden">
-              <div className="ui-card rounded-xl border border-subtle bg-background-primary p-4">
-              <div className="flex flex-col space-y-4">
-              {['About', 'Skills', 'Projects', 'Experience', 'Contact'].map((item) => (
-                <button
-                  key={item}
-                  onClick={() => scrollToSection(item.toLowerCase())}
-                  className="text-foreground-secondary hover:text-accent transition-colors duration-200 font-medium text-left"
-                >
-                  {item}
-                </button>
-              ))}
-            </div>
-          </div>
-            </div>
-          </>
-        )}
-      </nav>
+      {menuOpen && (
+        <MobileMenu
+          active={active}
+          time={time}
+          onClose={closeMenu}
+          onNavigate={onNavigate}
+          returnFocus={menuButton}
+        />
+      )}
     </header>
   );
 };
