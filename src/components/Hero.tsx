@@ -2,9 +2,6 @@ import { useEffect, useRef } from 'react';
 import { ArrowDown, Github, Linkedin, Mail, Code, Terminal } from 'lucide-react';
 import { gsap } from 'gsap';
 import { ScrollToPlugin } from 'gsap/ScrollToPlugin';
-import TypewriterCode from './TypewriterCode';
-import CursorDot from './CursorDot';
-import AnimatedBackground from './AnimatedBackground';
 
 gsap.registerPlugin(ScrollToPlugin);
 
@@ -15,7 +12,6 @@ const Hero = () => {
   const subtitleRef = useRef<HTMLParagraphElement>(null);
   const buttonsRef = useRef<HTMLDivElement>(null);
   const socialRef = useRef<HTMLDivElement>(null);
-  const codeRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     // GSAP Timeline for hero animations
@@ -52,15 +48,6 @@ const Hero = () => {
         { y: 50, opacity: 0 },
         { y: 0, opacity: 1, duration: 0.8, ease: "power2.out" },
         "-=0.3"
-      );
-    }
-
-    // Animate code terminal
-    if (codeRef.current) {
-      tl.fromTo(codeRef.current,
-        { y: 24, opacity: 0 },
-        { y: 0, opacity: 1, duration: 0.6, ease: 'power2.out' },
-        '-=0.5'
       );
     }
 
@@ -127,15 +114,11 @@ const Hero = () => {
 
   return (
     <>
-      <CursorDot />
-
       <section
         id="hero"
         ref={heroRef}
         className="relative flex min-h-[100dvh] min-h-screen items-center justify-center overflow-hidden bg-background-primary pt-20 sm:pt-24"
       >
-        <AnimatedBackground />
-
         <div className="container relative z-10 mx-auto px-6 pt-44 text-center">
           <div className="max-w-6xl mx-auto">
             {/* Developer name above title */}
@@ -165,14 +148,6 @@ const Hero = () => {
               Full-stack developer focused on clear UI, solid architecture, and products that stay
               maintainable after launch.
             </p>
-
-            {/* Typewriter code terminal */}
-            <div
-              ref={codeRef}
-              className="mb-10"
-            >
-              <TypewriterCode />
-            </div>
 
             {/* Action buttons */}
             <div

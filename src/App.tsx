@@ -1,7 +1,6 @@
-import  { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import AOS from 'aos';
 import 'aos/dist/aos.css';
-import Preloader from './components/Preloader';
 import Header from './components/Header';
 import Hero from './components/Hero';
 import About from './components/About';
@@ -12,8 +11,6 @@ import Contact from './components/Contact';
 import Footer from './components/Footer';
 
 function App() {
-  const [isLoading, setIsLoading] = useState(true);
-
   useEffect(() => {
     AOS.init({
       duration: 800,
@@ -24,23 +21,17 @@ function App() {
     });
   }, []);
 
-  const handleLoadingComplete = () => {
-    setIsLoading(false);
-  };
-
-  if (isLoading) {
-    return <Preloader onComplete={handleLoadingComplete} />;
-  }
-
   return (
     <div className="min-h-screen bg-background-primary">
       <Header />
-      <Hero />
-      <About />
-      <Skills />
-      <Projects />
-      <Experience />
-      <Contact />
+      <main>
+        <Hero />
+        <Projects />
+        <About />
+        <Skills />
+        <Experience />
+        <Contact />
+      </main>
       <Footer />
     </div>
   );
