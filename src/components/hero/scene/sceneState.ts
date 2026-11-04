@@ -38,6 +38,12 @@ export const sceneState = {
   scrollProgress: 0,
   /** Node under the pointer (spec §10 node hover). */
   hovered: null as NodeId | null,
+  /**
+   * Expanded canvas (desktop pin): the stage rect inside the hero-wide
+   * canvas layer, in CSS px. The camera frames the stage as at rest and
+   * renders the rest of the layer around it.
+   */
+  view: { enabled: false, x: 0, y: 0, width: 1, height: 1, layerWidth: 1, layerHeight: 1 },
 };
 
 // Dev-only handle for inspecting the scene from the browser console

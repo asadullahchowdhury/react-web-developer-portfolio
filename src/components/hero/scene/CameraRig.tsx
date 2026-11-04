@@ -42,16 +42,24 @@ const CameraRig = ({ root }: { root: RefObject<Group> }) => {
     camera.lookAt(v.restLook);
   }, [camera, v]);
 
-  useFrame(() => {
-    const { pointer, scrollProgress } = sceneState;
+  useFrame(({ size }) => {
+    const { pointer, scrollProgress, view } = sceneState;
 
     // Scroll dolly, eased so it starts and settles gently
     const d = MathUtils.smoothstep(Math.min(scrollProgress / DOLLY_END, 1), 0, 1);
     v.pos.lerpVectors(v.restPos, v.endPos, d);
     v.look.lerpVectors(v.restLook, v.endLook, d);
-    const fov = MathUtils.lerp(CAMERA.rest.fov, CAMERA.dollyEnd.fov, d);
-    if (camera.fov !== fov) {
-      camera.fov = fov;
+    camera.fov = MathUtils.lerp(CAMERA.rest.fov, CAMERA.dollyEnd.fov, d);
+
+    if (view.enabled) {
+      // Hero-wide canvas: the stage is the reference frame (FOV and aspect),
+      // and the canvas is a larger window around it, so the rest framing is
+      // unchanged while the dolly can grow past the stage.
+      camera.aspect = view.width / view.height;
+      camera.setViewOffset(view.width, view.height, -view.x, -view.y, size.width, size.height);
+    } else {
+      if (camera.view) camera.clearViewOffset();
+      camera.aspect = size.width / size.height;
       camera.updateProjectionMatrix();
     }
 

@@ -34,13 +34,14 @@ export function useHeroScroll(scope: RefObject<HTMLElement>, runwayRef: RefObjec
     const runway = runwayRef.current;
     if (!root || !runway || prefersReducedMotion()) return;
 
-    const sceneLayer = root.querySelector<HTMLElement>('[data-scene-layer]');
+    // Poster layer in the stage, plus the hero-wide canvas layer on desktop
+    const sceneLayers = Array.from(root.querySelectorAll<HTMLElement>('[data-scene-layer]'));
 
     // Mobile: no pin. Fade the scene as the hero scrolls away.
     if (isMobileLike()) {
       const ctx = gsap.context(() => {
-        if (!sceneLayer) return;
-        gsap.to(sceneLayer, {
+        if (!sceneLayers.length) return;
+        gsap.to(sceneLayers, {
           opacity: 0.15,
           ease: 'none',
           scrollTrigger: { trigger: root, start: 'top top', end: 'bottom top', scrub: true },
@@ -89,7 +90,7 @@ export function useHeroScroll(scope: RefObject<HTMLElement>, runwayRef: RefObjec
         .to(q('[data-panel="schema"]'), { scale: 1.15, xPercent: 60, yPercent: -40, opacity: 0, duration: 0.45 }, 0.35)
         .to(q('[data-hud-chapter="current"]'), { opacity: 0, duration: 0.04 }, 0.8)
         .to(q('[data-hud-chapter="next"]'), { opacity: 1, duration: 0.04 }, 0.8);
-      if (sceneLayer) tl.to(sceneLayer, { opacity: 0.15, duration: 0.2 }, 0.8);
+      if (sceneLayers.length) tl.to(sceneLayers, { opacity: 0.15, duration: 0.2 }, 0.8);
       tl.set({}, {}, 1); // timeline spans exactly p 0 → 1
 
       // "Enter the lab" and nav "Work" land at the end of the pin (§11.3)
