@@ -6,6 +6,8 @@ import { sceneState } from './sceneState';
 import { hologramFragment, hologramVertex } from './shaders/hologram';
 
 const MASK_SIZE = 1024;
+const HOLOGRAM_YAW = (6 * Math.PI) / 180;
+const HOLOGRAM_PITCH = (3 * Math.PI) / 180;
 
 /**
  * Placeholder hologram: a plane that turns to face the camera (yaw only),
@@ -67,8 +69,12 @@ const Hologram = () => {
       u.uFlicker.value = 1;
     }
 
-    // Face the camera around Y only, so the figure stays upright
-    m.rotation.y = Math.atan2(camera.position.x - m.position.x, camera.position.z - m.position.z);
+    // Face the camera around Y only, so the figure stays upright, then turn
+    // toward the pointer: yaw x × 6°, pitch y × 3° (spec §10)
+    const { x, y } = sceneState.pointer;
+    m.rotation.y =
+      Math.atan2(camera.position.x - m.position.x, camera.position.z - m.position.z) + x * HOLOGRAM_YAW;
+    m.rotation.x = y * HOLOGRAM_PITCH;
   });
 
   return (

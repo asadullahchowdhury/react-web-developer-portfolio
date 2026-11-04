@@ -29,6 +29,15 @@ export const sceneState = {
     dust: 0,
     nodes: { interface: 0, api: 0, services: 0, database: 0 } as Record<NodeId, number>,
   },
+  /**
+   * Smoothed pointer, −1…1 across the viewport (y down), already scaled by
+   * the scroll fade-out. Written by useHeroParallax (spec §10).
+   */
+  pointer: { x: 0, y: 0 },
+  /** Hero pin progress 0 → 1 (spec §11). Written by the scroll step. */
+  scrollProgress: 0,
+  /** Node under the pointer (spec §10 node hover). */
+  hovered: null as NodeId | null,
 };
 
 // Dev-only handle for inspecting the scene from the browser console

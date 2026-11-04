@@ -4,6 +4,7 @@ import HeroCopy from './HeroCopy';
 import HeroHUD from './HeroHUD';
 import HeroStage from './HeroStage';
 import { useHeroIntro } from './useHeroIntro';
+import { useHeroParallax } from './useHeroParallax';
 
 /**
  * Hero — "Rahat's Digital Lab" (hero-redesign-spec §2–3, §9).
@@ -14,6 +15,7 @@ import { useHeroIntro } from './useHeroIntro';
 const Hero = () => {
   const sectionRef = useRef<HTMLElement>(null);
   useHeroIntro(sectionRef);
+  useHeroParallax(sectionRef);
 
   return (
     <section

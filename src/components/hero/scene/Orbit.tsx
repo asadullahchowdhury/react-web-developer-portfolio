@@ -1,9 +1,10 @@
 import { useLayoutEffect, useMemo, useRef } from 'react';
-import { useFrame } from '@react-three/fiber';
+import { type ThreeEvent, useFrame, useThree } from '@react-three/fiber';
 import {
   BufferGeometry,
   Color,
   Float32BufferAttribute,
+  type Group,
   type InstancedMesh,
   Line,
   LineBasicMaterial,
@@ -13,7 +14,7 @@ import {
   Quaternion,
   Vector3,
 } from 'three';
-import { COLORS, NODES, WORLD } from './config';
+import { COLORS, type NodeId, NODES, WORLD } from './config';
 import { ellipsePoints, orbitPoint, roundedBoxGeometry, roundedSquareOutline } from './geometry';
 import { sceneState } from './sceneState';
 
@@ -23,26 +24,53 @@ const PACKET_ANGLES = [20, 140, 260] as const;
 const PACKET_SPEED = 0.08;
 /** Node dot pulse: 70–100% emissive, 3 s period, staggered (spec §9.2). */
 const PULSE = { min: 0.7, period: 3 };
+/** Node hover (spec §10): emissive +40%, its orbit segment to 45% opacity. */
+const HOVER = { emissive: 0.4, arcOpacity: 0.45, arcHalfAngle: 16, smoothing: 14 };
+/** Label colour on hover: --text-tertiary → --text-primary. */
+const LABEL_RGB = { rest: [122, 131, 150], hover: [237, 239, 243] } as const;
 
 /** Label offset from the projected node centre, in CSS px (artboard 01). */
 const LABEL_GAP = { above: 18, below: 24 } as const;
 
 const IDENTITY = new Quaternion();
 
+/** Short arc of the orbit around a node, in the orbit's local plane. */
+function orbitArc(angleDeg: number): Line {
+  const { rx, rz } = WORLD.orbit;
+  const positions: number[] = [];
+  const steps = 24;
+  for (let k = 0; k <= steps; k++) {
+    const deg = angleDeg - HOVER.arcHalfAngle + (k / steps) * HOVER.arcHalfAngle * 2;
+    const a = (deg * Math.PI) / 180;
+    positions.push(Math.cos(a) * rx, 0, -Math.sin(a) * rz);
+  }
+  const geometry = new BufferGeometry();
+  geometry.setAttribute('position', new Float32BufferAttribute(positions, 3));
+  const arc = new Line(
+    geometry,
+    new LineBasicMaterial({ color: COLORS.signal, transparent: true, opacity: 0, depthWrite: false }),
+  );
+  arc.visible = false;
+  return arc;
+}
+
 /**
- * Orbit ellipse, the four system nodes, data packets, and the DOM labels'
- * screen positions (spec §7.1, §7.3, §8 #6–9, §9).
+ * Orbit ellipse, the four system nodes, data packets, node hover, and the
+ * DOM labels' screen positions (spec §7.1, §7.3, §8 #6–9, §9, §10).
  */
-const Orbit = () => {
+const Orbit = ({ interactive }: { interactive: boolean }) => {
   const { orbit, node, packets } = WORLD;
+  const invalidate = useThree((s) => s.invalidate);
+  const system = useRef<Group>(null);
   const bodies = useRef<InstancedMesh>(null);
   const dots = useRef<InstancedMesh>(null);
   const packetRefs = useRef<(Mesh | null)[]>([]);
   const travel = useRef(0);
+  const highlight = useRef<Record<NodeId, number>>({ interface: 0, api: 0, services: 0, database: 0 });
 
   const nodePositions = useMemo(() => NODES.map((n) => orbitPoint(n.angle)), []);
 
-  const { orbitLine, outlines, boxGeometry } = useMemo(() => {
+  const { orbitLine, outlines, arcs, boxGeometry } = useMemo(() => {
     const line = new Line(
       ellipsePoints(orbit.rx, orbit.rz, orbit.segments),
       new LineBasicMaterial({ color: COLORS.signal, transparent: true, opacity: orbit.opacity, depthWrite: false }),
@@ -67,7 +95,18 @@ const Orbit = () => {
       return segments;
     });
 
-    return { orbitLine: line, outlines: edges, boxGeometry: roundedBoxGeometry(node.size, node.radius) };
+    const nodeArcs = NODES.map((n) => {
+      const arc = orbitArc(n.angle);
+      arc.name = `orbit-arc-${n.id}`;
+      return arc;
+    });
+
+    return {
+      orbitLine: line,
+      outlines: edges,
+      arcs: nodeArcs,
+      boxGeometry: roundedBoxGeometry(node.size, node.radius),
+    };
   }, [orbit, node, nodePositions]);
 
   // Instance colours must exist before the first frame
@@ -97,32 +136,44 @@ const Orbit = () => {
   useFrame(({ camera, size, clock }, delta) => {
     const { intro, motion } = sceneState;
     const t = clock.elapsedTime;
+    const step = Math.min(delta, 0.1);
 
     // Orbit line draws on
     const points = Math.round(intro.orbit * orbit.segments) + 1;
     orbitLine.geometry.setDrawRange(0, intro.orbit > 0 ? points : 0);
 
-    // Nodes: scale 0.6 → 1 and fade in; dots pulse once revealed
     NODES.forEach((n, i) => {
       const reveal = intro.nodes[n.id];
+
+      // Hover highlight eases toward its goal (instant with reduced motion)
+      const goal = sceneState.hovered === n.id ? 1 : 0;
+      const prev = highlight.current[n.id];
+      const h = motion ? prev + (goal - prev) * (1 - Math.exp(-HOVER.smoothing * step)) : goal;
+      highlight.current[n.id] = h;
+      const lift = 1 + HOVER.emissive * h;
+
+      // Scale 0.6 → 1 and fade in; dots pulse once revealed
       const s = reveal > 0 ? 0.6 + 0.4 * reveal : 0;
       const p = nodePositions[i];
-
       tmp.scale.setScalar(s);
       bodies.current?.setMatrixAt(i, tmp.matrix.compose(p, IDENTITY, tmp.scale));
-      bodies.current?.setColorAt(i, tmp.color.copy(tmp.voidColor).lerp(tmp.graphite, reveal));
+      bodies.current?.setColorAt(i, tmp.color.copy(tmp.voidColor).lerp(tmp.graphite, reveal).multiplyScalar(lift));
 
       tmp.pos.set(p.x, p.y, p.z + (node.size / 2 + 0.006) * s);
       dots.current?.setMatrixAt(i, tmp.matrix.compose(tmp.pos, IDENTITY, tmp.scale));
       const pulse = motion
         ? PULSE.min + (1 - PULSE.min) * (0.5 + 0.5 * Math.sin((t / PULSE.period) * Math.PI * 2 - i * (Math.PI / 2)))
         : 1;
-      dots.current?.setColorAt(i, tmp.color.copy(tmp.dotColor).multiplyScalar(pulse * reveal));
+      dots.current?.setColorAt(i, tmp.color.copy(tmp.dotColor).multiplyScalar(pulse * reveal * lift));
 
       const edge = outlines[i];
       edge.visible = reveal > 0;
       edge.scale.setScalar(Math.max(s, 0.0001));
-      (edge.material as LineBasicMaterial).opacity = node.edgeOpacity * reveal;
+      (edge.material as LineBasicMaterial).opacity = Math.min(1, node.edgeOpacity * reveal * lift);
+
+      const arc = arcs[i];
+      arc.visible = h > 0.001;
+      (arc.material as LineBasicMaterial).opacity = HOVER.arcOpacity * h;
     });
     for (const mesh of [bodies.current, dots.current]) {
       if (!mesh) continue;
@@ -131,7 +182,7 @@ const Orbit = () => {
     }
 
     // Packets appear, then travel along the orbit
-    if (motion && intro.packets > 0) travel.current += Math.min(delta, 0.1) * PACKET_SPEED;
+    if (motion && intro.packets > 0) travel.current += step * PACKET_SPEED;
     packetRefs.current.forEach((mesh, i) => {
       if (!mesh) return;
       orbitPoint(PACKET_ANGLES[i] + travel.current * 360, mesh.position);
@@ -139,13 +190,18 @@ const Orbit = () => {
       mesh.scale.setScalar(Math.max(intro.packets, 0.0001));
     });
 
-    // Labels: follow their nodes and fade in with them.
-    // useFrame runs before the renderer refreshes the camera matrices.
+    // Labels follow their nodes through the parallax-rotated scene root.
+    // useFrame runs before the renderer refreshes world matrices.
     camera.updateMatrixWorld();
+    system.current?.updateWorldMatrix(true, false);
+    const [r0, g0, b0] = LABEL_RGB.rest;
+    const [r1, g1, b1] = LABEL_RGB.hover;
     NODES.forEach((n, i) => {
       const el = sceneState.labels[n.id];
       if (!el) return;
-      tmp.projected.copy(nodePositions[i]).project(camera);
+      tmp.projected.copy(nodePositions[i]);
+      if (system.current) tmp.projected.applyMatrix4(system.current.matrixWorld);
+      tmp.projected.project(camera);
       const x = (tmp.projected.x * 0.5 + 0.5) * size.width;
       const y = (-tmp.projected.y * 0.5 + 0.5) * size.height;
       el.style.opacity = String(intro.nodes[n.id]);
@@ -153,16 +209,44 @@ const Orbit = () => {
         n.labelSide === 'above'
           ? `translate(${x}px, ${y - LABEL_GAP.above}px) translate(-50%, -100%)`
           : `translate(${x}px, ${y + LABEL_GAP.below}px) translate(-50%, 0)`;
+      const h = highlight.current[n.id];
+      el.style.color =
+        h > 0.001 ? `rgb(${r0 + (r1 - r0) * h} ${g0 + (g1 - g0) * h} ${b0 + (b1 - b0) * h})` : '';
     });
   });
 
+  // Raycast hover on the node bodies; desktop fine pointer only. The cursor
+  // stays default: nodes are not links (spec §10).
+  const setHovered = (id: NodeId | null) => {
+    if (sceneState.hovered === id) return;
+    sceneState.hovered = id;
+    invalidate();
+  };
+  const hoverHandlers = interactive
+    ? {
+        onPointerMove: (e: ThreeEvent<PointerEvent>) => {
+          e.stopPropagation();
+          if (e.instanceId !== undefined) setHovered(NODES[e.instanceId].id);
+        },
+        onPointerOut: () => setHovered(null),
+      }
+    : {};
+
   return (
-    <group name="orbit-system">
+    <group ref={system} name="orbit-system">
       <group position-y={orbit.y} rotation-x={orbit.tilt}>
         <primitive object={orbitLine} />
+        {arcs.map((arc) => (
+          <primitive key={arc.name} object={arc} />
+        ))}
       </group>
 
-      <instancedMesh ref={bodies} args={[boxGeometry, undefined, NODES.length]} name="node-bodies">
+      <instancedMesh
+        ref={bodies}
+        args={[boxGeometry, undefined, NODES.length]}
+        name="node-bodies"
+        {...hoverHandlers}
+      >
         <meshStandardMaterial color="#ffffff" roughness={0.7} metalness={0.1} />
       </instancedMesh>
       {outlines.map((edge) => (

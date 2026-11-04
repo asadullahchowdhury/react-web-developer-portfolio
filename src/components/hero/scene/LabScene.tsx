@@ -1,5 +1,7 @@
-import { useCallback, useLayoutEffect, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import { useThree } from '@react-three/fiber';
+import type { Group } from 'three';
+import CameraRig from './CameraRig';
 import Bloom from './Bloom';
 import Dust from './Dust';
 import Hologram from './Hologram';
@@ -9,8 +11,9 @@ import Platform from './Platform';
 import QualityMonitor from './QualityMonitor';
 import RenderLoop, { type Frameloop } from './RenderLoop';
 import SceneIntro from './SceneIntro';
-import { CAMERA, FOG, LIGHTS } from './config';
+import { FOG, LIGHTS } from './config';
 import { sceneState } from './sceneState';
+import { hasFinePointer } from '../../../lib/capabilities';
 
 interface LabSceneProps {
   mobile: boolean;
@@ -20,18 +23,12 @@ interface LabSceneProps {
 
 /**
  * Scene root: fog, lights, camera rest framing, every scene object, and the
- * performance controls (spec §6–8, §13). The camera rig replaces the one-off
- * lookAt once the dolly and parallax exist.
+ * performance controls (spec §6–8, §13). Camera framing and parallax live in CameraRig.
  */
 const LabScene = ({ mobile, reducedMotion, onFrameloopChange }: LabSceneProps) => {
-  const camera = useThree((state) => state.camera);
   const setDpr = useThree((state) => state.setDpr);
+  const root = useRef<Group>(null);
   const [quality, setQuality] = useState<'high' | 'low'>('high');
-
-  useLayoutEffect(() => {
-    const [x, y, z] = CAMERA.rest.lookAt;
-    camera.lookAt(x, y, z);
-  }, [camera]);
 
   /** Low-end fallback: no bloom, half the dust, DPR 1. */
   const degrade = useCallback(() => {
@@ -40,6 +37,9 @@ const LabScene = ({ mobile, reducedMotion, onFrameloopChange }: LabSceneProps) =
     setDpr(1);
   }, [setDpr]);
 
+  // Node hover only with a precise, hover-capable pointer (spec §10)
+  const [interactive] = useState(() => !mobile && hasFinePointer());
+
   // Mobile never blooms (spec §12); desktop drops it when degraded
   const bloom = !mobile && quality === 'high';
 
@@ -47,6 +47,7 @@ const LabScene = ({ mobile, reducedMotion, onFrameloopChange }: LabSceneProps) =
     <>
       <RenderLoop animate={!reducedMotion} onChange={onFrameloopChange} />
       <SceneIntro reducedMotion={reducedMotion} />
+      <CameraRig root={root} />
       {!reducedMotion && <QualityMonitor onDegrade={degrade} />}
 
       <fog attach="fog" args={[FOG.color, FOG.near, FOG.far]} />
@@ -65,11 +66,11 @@ const LabScene = ({ mobile, reducedMotion, onFrameloopChange }: LabSceneProps) =
         intensity={LIGHTS.rim.intensity}
       />
 
-      <group name="lab-root">
+      <group ref={root} name="lab-root">
         <Platform />
         <LightCone />
         <Hologram />
-        <Orbit />
+        <Orbit interactive={interactive} />
         <Dust mobile={mobile} density={quality === 'high' ? 1 : 0.5} />
       </group>
 
