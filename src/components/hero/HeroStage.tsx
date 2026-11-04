@@ -1,6 +1,7 @@
 import { lazy, Suspense, useCallback, useEffect, useState } from 'react';
 import { getSceneCapabilities } from '../../lib/capabilities';
 import GlassPanel from './GlassPanel';
+import NodeLabels from './NodeLabels';
 import SceneErrorBoundary from './SceneErrorBoundary';
 import ScenePoster from './ScenePoster';
 import { deployPanel, heroCopy, schemaPanel } from './heroContent';
@@ -93,6 +94,7 @@ const HeroStage = () => {
               <LabCanvas mobile={mobile} onReady={handleReady} onContextLost={handleFailure} />
             </Suspense>
           </SceneErrorBoundary>
+          <NodeLabels />
         </div>
       )}
 

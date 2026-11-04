@@ -1,13 +1,18 @@
 import { useLayoutEffect } from 'react';
 import { useThree } from '@react-three/fiber';
+import Dust from './Dust';
+import Hologram from './Hologram';
+import LightCone from './LightCone';
+import Orbit from './Orbit';
+import Platform from './Platform';
 import { CAMERA, FOG, LIGHTS } from './config';
 
 /**
- * Scene root: fog, lights and the camera's rest framing (spec §6, §7.2).
- * Scene objects are added in the next step; the camera rig replaces the
- * one-off lookAt once the dolly and parallax exist.
+ * Scene root: fog, lights, camera rest framing and every scene object
+ * (spec §6–8). The camera rig replaces the one-off lookAt once the dolly
+ * and parallax exist.
  */
-const LabScene = () => {
+const LabScene = ({ mobile }: { mobile: boolean }) => {
   const camera = useThree((state) => state.camera);
 
   useLayoutEffect(() => {
@@ -33,7 +38,13 @@ const LabScene = () => {
         intensity={LIGHTS.rim.intensity}
       />
 
-      <group name="lab-root">{/* Platform, cone, hologram, orbit, dust — next step */}</group>
+      <group name="lab-root">
+        <Platform />
+        <LightCone />
+        <Hologram />
+        <Orbit />
+        <Dust mobile={mobile} />
+      </group>
     </>
   );
 };

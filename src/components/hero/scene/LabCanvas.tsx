@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { Suspense, useRef } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { ACESFilmicToneMapping, SRGBColorSpace } from 'three';
 import LabScene from './LabScene';
@@ -58,8 +58,12 @@ const LabCanvas = ({ mobile, onReady, onContextLost }: LabCanvasProps) => (
     }}
     style={{ position: 'absolute', inset: 0 }}
   >
-    <LabScene />
-    <FirstFrameSignal onReady={onReady} />
+    {/* The first-frame signal sits inside the same boundary, so the poster
+        only fades once the mask texture has loaded and the scene is complete. */}
+    <Suspense fallback={null}>
+      <LabScene mobile={mobile} />
+      <FirstFrameSignal onReady={onReady} />
+    </Suspense>
   </Canvas>
 );
 
