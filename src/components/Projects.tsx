@@ -5,7 +5,7 @@ const Projects = () => {
         {
             title: 'CAFM Platform',
             description: 'Computer-aided facilities management — assets, work orders and maintenance in one system.',
-            image: '/assets/images/project-placeholder.svg',
+            image: '/assets/images/cafm-platform.png',
             technologies: ['Angular', 'Bootstrap', 'Vue.js', 'Stripe'],
             liveUrl: '#',
             githubUrl: ''
