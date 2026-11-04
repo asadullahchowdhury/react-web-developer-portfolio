@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { BufferGeometry, Color, Float32BufferAttribute, ShaderMaterial } from 'three';
 import { COLORS, FOG, WORLD } from './config';
@@ -33,7 +33,7 @@ const dustFragment = /* glsl */ `
 `;
 
 /** Fine dust filling the volume (spec §8 #10). Round sprites, 1–1.5 CSS px. */
-const Dust = ({ mobile }: { mobile: boolean }) => {
+const Dust = ({ mobile, density = 1 }: { mobile: boolean; density?: number }) => {
   const count = mobile ? WORLD.dust.mobile : WORLD.dust.desktop;
 
   const { geometry, material } = useMemo(() => {
@@ -71,6 +71,11 @@ const Dust = ({ mobile }: { mobile: boolean }) => {
     });
     return { geometry: geo, material: mat };
   }, [count]);
+
+  // Low-end mode draws only part of the (already shuffled) field
+  useEffect(() => {
+    geometry.setDrawRange(0, Math.floor(count * density));
+  }, [geometry, count, density]);
 
   useFrame(({ viewport }) => {
     material.uniforms.uPixelRatio.value = viewport.dpr;

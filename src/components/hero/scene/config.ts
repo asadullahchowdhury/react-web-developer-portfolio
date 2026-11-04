@@ -38,6 +38,26 @@ export const DPR = {
   mobile: [1, 1.5] as [number, number],
 };
 
+/** Selective bloom (spec §6): threshold ≈ 0.8, intensity ≈ 0.6, radius ≈ 0.4. Desktop only. */
+export const BLOOM = {
+  threshold: 0.8,
+  smoothing: 0.3,
+  intensity: 0.6,
+  radius: 0.4,
+  iterations: 2,
+};
+
+/** Render layer used to pick bloom objects, and the objects that join it. */
+export const BLOOM_LAYER = 1;
+export const BLOOM_TARGETS = ['hologram', 'packet', 'node-dots', 'pad-glow'] as const;
+
+/** Low-end detection (spec §13): below 40 fps for 2 s → drop bloom, halve dust, DPR 1. */
+export const PERF = {
+  minFps: 40,
+  sustainSeconds: 2,
+  warmupSeconds: 1.5,
+};
+
 export const WORLD = {
   /** spec: outer r 3.1 (white 7%), inner r 1.5 (signal 35%) */
   rings: { outerRadius: 2.03, outerOpacity: 0.07, innerRadius: 0.98, innerOpacity: 0.35, segments: 160 },

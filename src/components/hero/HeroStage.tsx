@@ -91,7 +91,12 @@ const HeroStage = () => {
         >
           <SceneErrorBoundary onError={handleFailure}>
             <Suspense fallback={null}>
-              <LabCanvas mobile={mobile} onReady={handleReady} onContextLost={handleFailure} />
+              <LabCanvas
+                mobile={mobile}
+                reducedMotion={reducedMotion}
+                onReady={handleReady}
+                onContextLost={handleFailure}
+              />
             </Suspense>
           </SceneErrorBoundary>
           <NodeLabels />

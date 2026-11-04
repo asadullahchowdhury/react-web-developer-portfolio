@@ -8,8 +8,16 @@ const media = (query: string) =>
 
 export const prefersReducedMotion = () => media('(prefers-reduced-motion: reduce)');
 
+/** Dev-only URL overrides for testing, e.g. `?webgl=0` or `?mobile=0`. */
+const devOverride = (key: string): string | null =>
+  import.meta.env.DEV ? new URLSearchParams(window.location.search).get(key) : null;
+
 /** Mobile rules apply below 768px or on coarse pointers (spec §12). */
-export const isMobileLike = () => media('(max-width: 767px)') || media('(pointer: coarse)');
+export const isMobileLike = () => {
+  const forced = devOverride('mobile');
+  if (forced !== null) return forced === '1';
+  return media('(max-width: 767px)') || media('(pointer: coarse)');
+};
 
 /** Mouse parallax and hover only on precise, hover-capable pointers (spec §10). */
 export const hasFinePointer = () => media('(pointer: fine) and (hover: hover)');
@@ -22,9 +30,7 @@ let webglSupport: boolean | undefined;
  * Dev builds accept `?webgl=0` to force the no-WebGL fallback.
  */
 export function supportsWebGL(): boolean {
-  if (import.meta.env.DEV && new URLSearchParams(window.location.search).get('webgl') === '0') {
-    return false;
-  }
+  if (devOverride('webgl') === '0') return false;
   if (webglSupport !== undefined) return webglSupport;
 
   try {
