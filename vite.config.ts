@@ -63,9 +63,40 @@ function saveScenePoster(): Plugin {
   };
 }
 
+/**
+ * Dev-server only: saves app icons rendered by `window.__renderIcons` (see
+ * src/components/brand/devIcons.ts) into public/icons/. Fixed file names only.
+ */
+const ICON_NAMES = /^(favicon-32|apple-touch-icon|icon-192|icon-512)\.png$/;
+const ICONS_DIR = fileURLToPath(new URL('./public/icons/', import.meta.url));
+
+function saveAppIcons(): Plugin {
+  return {
+    name: 'dev-save-app-icons',
+    apply: 'serve',
+    configureServer(server) {
+      server.middlewares.use('/__dev/save-app-icon', (req, res) => {
+        const name = String(req.headers['x-name'] ?? '');
+        if (req.method !== 'POST' || !ICON_NAMES.test(name)) {
+          res.statusCode = 400;
+          res.end('bad request');
+          return;
+        }
+        const chunks: Buffer[] = [];
+        req.on('data', (c: Buffer) => chunks.push(c));
+        req.on('end', () => {
+          const data = Buffer.concat(chunks);
+          writeFileSync(ICONS_DIR + name, data);
+          res.end(`saved ${name} (${data.length} bytes)`);
+        });
+      });
+    },
+  };
+}
+
 // https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [react(), preloadFonts(), saveScenePoster()],
+  plugins: [react(), preloadFonts(), saveScenePoster(), saveAppIcons()],
   optimizeDeps: {
     exclude: ['lucide-react'],
   },

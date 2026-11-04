@@ -1,6 +1,6 @@
 import { type RefObject, useEffect } from 'react';
 import { gsap } from '../../lib/motion';
-import { loadScrollLibs, registerScrollTarget, scrollToPosition } from '../../lib/scroll';
+import { loadScrollLibs, registerScrollTarget, scrollToPosition, setHeroPinned } from '../../lib/scroll';
 import { sceneState } from './scene/sceneState';
 import type { SceneMode } from './useSceneMode';
 
@@ -93,6 +93,8 @@ export function useHeroScroll(
             pinSpacing: false,
             scrub: SCRUB,
             invalidateOnRefresh: true,
+            // The header reads this: it never hides during the pin
+            onToggle: (self) => setHeroPinned(self.isActive),
           },
           onUpdate: () => {
             sceneState.scrollProgress = tl.progress();
@@ -128,6 +130,7 @@ export function useHeroScroll(
         ctx.revert();
         runway.style.height = '0px';
         sceneState.scrollProgress = 0;
+        setHeroPinned(false);
       };
       ScrollTrigger.refresh();
     });

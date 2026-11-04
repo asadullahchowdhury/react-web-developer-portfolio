@@ -1,131 +1,105 @@
-import { useEffect, useState, type MouseEvent } from 'react';
-import { Menu, X } from 'lucide-react';
+import { type MouseEvent, useCallback, useEffect, useRef, useState } from 'react';
 import { scrollToId } from '../lib/scroll';
+import Logo from './brand/Logo';
+import DesktopHeader from './header/DesktopHeader';
+import MobileMenu from './header/MobileMenu';
+import { NAV_ITEMS, SECTION_IDS } from './header/navItems';
+import { useActiveSection } from './header/useActiveSection';
+import { useHeaderScroll } from './header/useHeaderScroll';
+import { useInert } from './header/useInert';
+import { useLocalTime } from './header/useLocalTime';
 
-/** Nav per hero-redesign-spec §2.2. Scroll targets become pin-aware in the scroll step. */
-const NAV_ITEMS = [
-  { label: 'Work', target: 'projects' },
-  { label: 'Stack', target: 'skills' },
-  { label: 'Experience', target: 'experience' },
-  { label: 'Contact', target: 'contact' },
-] as const;
-
+/**
+ * Site header: desktop states 1 / 2 (≥ 768 px), mobile floating bar and
+ * full-screen menu (< 768 px).
+ *
+ * The root stays a <header> (the hero intro fades it in) and ignores the
+ * pointer except on its bars, so it never blocks the page underneath.
+ */
 const Header = () => {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isScrolled, setIsScrolled] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const { compact, hidden } = useHeaderScroll(menuOpen);
+  const active = useActiveSection(SECTION_IDS);
+  const time = useLocalTime();
+  const menuButton = useRef<HTMLButtonElement>(null);
+  const mobileBar = useRef<HTMLDivElement>(null);
+  const pendingTarget = useRef<string | null>(null);
+  useInert(mobileBar, menuOpen);
+
+  const closeMenu = useCallback(() => setMenuOpen(false), []);
+
+  // Links: scroll to the section; sections that don't exist yet are a no-op.
+  // From the menu, scroll after it has closed and unlocked page scrolling.
+  const onNavigate = useCallback(
+    (target: string) => (e: MouseEvent<HTMLAnchorElement>) => {
+      e.preventDefault();
+      if (menuOpen) {
+        pendingTarget.current = target;
+        setMenuOpen(false);
+      } else {
+        scrollToId(target);
+      }
+    },
+    [menuOpen],
+  );
 
   useEffect(() => {
-    const handleScroll = () => {
-      const next = window.scrollY > 12;
-      setIsScrolled(prev => (prev !== next ? next : prev));
-    };
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    handleScroll();
-    return () => window.removeEventListener('scroll', handleScroll);
+    if (menuOpen || !pendingTarget.current) return;
+    scrollToId(pendingTarget.current);
+    pendingTarget.current = null;
+  }, [menuOpen]);
+
+  // The menu is mobile-only: close it if the window grows past 768 px
+  useEffect(() => {
+    const desktop = window.matchMedia('(min-width: 768px)');
+    const onChange = () => desktop.matches && setMenuOpen(false);
+    desktop.addEventListener('change', onChange);
+    return () => desktop.removeEventListener('change', onChange);
   }, []);
 
-  useEffect(() => {
-    if (!isMenuOpen) return;
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setIsMenuOpen(false);
-    };
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-  }, [isMenuOpen]);
-
-  const scrollToSection = (e: MouseEvent<HTMLAnchorElement>, sectionId: string) => {
-    setIsMenuOpen(false);
-    if (scrollToId(sectionId)) e.preventDefault();
-  };
+  const current = NAV_ITEMS.find((i) => i.target === active) ?? NAV_ITEMS[0];
 
   return (
-    <header
-      className={`fixed inset-x-0 top-0 z-50 border-b transition-colors duration-300 ${
-        isScrolled || isMenuOpen
-          ? 'border-subtle bg-void/80 backdrop-blur-md'
-          : 'border-transparent bg-transparent'
-      }`}
-    >
-      <nav
-        aria-label="Primary"
-        className="relative mx-auto flex max-w-[1440px] items-center justify-between px-5 py-4 md:px-8 md:py-7 lg:px-12 xl:px-16"
+    <header className="pointer-events-none fixed inset-x-0 top-0 z-50">
+      <DesktopHeader compact={compact} hidden={hidden} active={active} time={time} onNavigate={onNavigate} />
+
+      {/* Mobile floating bar */}
+      <div
+        ref={mobileBar}
+        className={`pointer-events-auto absolute inset-x-3 top-2.5 transition-[opacity,transform] duration-300 ease-lab motion-reduce:transition-none md:hidden ${
+          hidden ? '-translate-y-[140%] opacity-0' : 'translate-y-0 opacity-100'
+        }`}
       >
-        {/* Logo: RC mark + name */}
-        <a
-          href="#hero"
-          onClick={(e) => scrollToSection(e, 'hero')}
-          className="flex min-h-11 items-center gap-3 rounded-lg"
-          aria-label="Rahat Chowdhury — back to top"
-        >
-          <span
-            aria-hidden="true"
-            className="flex h-11 w-11 items-center justify-center rounded-lg border border-strong font-mono text-xs font-medium text-ink-primary md:h-8 md:w-8"
+        <div className="flex h-14 items-center justify-between gap-3 rounded-full border border-subtle bg-void/70 pl-4 pr-1.5 backdrop-blur-xl">
+          <a href="#hero" onClick={onNavigate('hero')} aria-label="Rahat Chowdhury — home" className="rounded-md">
+            <Logo variant="short" size={22} animate />
+          </a>
+          <span aria-hidden="true" className="truncate font-mono text-[11px] uppercase tracking-[0.12em] text-ink-tertiary">
+            {current.number} · {current.label}
+          </span>
+          <button
+            ref={menuButton}
+            type="button"
+            onClick={() => setMenuOpen(true)}
+            aria-haspopup="dialog"
+            aria-expanded={menuOpen}
+            aria-controls="site-menu"
+            className="inline-flex h-11 items-center rounded-full border border-strong px-5 text-[14px] font-medium text-ink-primary"
           >
-            RC
-          </span>
-          <span className="text-[15px] font-medium tracking-tight text-ink-primary">
-            Rahat Chowdhury
-          </span>
-        </a>
+            Menu
+          </button>
+        </div>
+      </div>
 
-        {/* Desktop / tablet navigation */}
-        <ul className="hidden items-center gap-1 md:flex">
-          {NAV_ITEMS.map(({ label, target }) => (
-            <li key={target}>
-              <a
-                href={`#${target}`}
-                onClick={(e) => scrollToSection(e, target)}
-                className="inline-flex min-h-11 items-center rounded-lg px-3.5 py-3 text-nav text-ink-secondary transition-colors duration-200 hover:text-ink-primary"
-              >
-                {label}
-              </a>
-            </li>
-          ))}
-        </ul>
-
-        {/* Mobile menu button */}
-        <button
-          type="button"
-          className="flex h-11 w-11 items-center justify-center rounded-full border border-strong text-ink-primary transition-colors hover:border-ink-tertiary md:hidden"
-          onClick={() => setIsMenuOpen(open => !open)}
-          aria-expanded={isMenuOpen}
-          aria-controls="mobile-nav"
-          aria-label={isMenuOpen ? 'Close menu' : 'Open menu'}
-        >
-          {isMenuOpen ? <X size={18} strokeWidth={1.75} /> : <Menu size={18} strokeWidth={1.75} />}
-        </button>
-
-        {/* Mobile navigation */}
-        {isMenuOpen && (
-          <>
-            <button
-              type="button"
-              tabIndex={-1}
-              aria-hidden="true"
-              onClick={() => setIsMenuOpen(false)}
-              className="fixed inset-0 top-[76px] z-40 cursor-default bg-void/70 md:hidden"
-            />
-            <div
-              id="mobile-nav"
-              className="absolute inset-x-5 top-full z-50 mt-2 rounded-xl border border-subtle bg-surface-card p-2 shadow-soft md:hidden"
-            >
-              <ul className="flex flex-col">
-                {NAV_ITEMS.map(({ label, target }) => (
-                  <li key={target}>
-                    <a
-                      href={`#${target}`}
-                      onClick={(e) => scrollToSection(e, target)}
-                      className="flex min-h-11 items-center rounded-lg px-4 text-body text-ink-secondary transition-colors hover:bg-glass hover:text-ink-primary"
-                    >
-                      {label}
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </>
-        )}
-      </nav>
+      {menuOpen && (
+        <MobileMenu
+          active={active}
+          time={time}
+          onClose={closeMenu}
+          onNavigate={onNavigate}
+          returnFocus={menuButton}
+        />
+      )}
     </header>
   );
 };

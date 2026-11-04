@@ -151,6 +151,61 @@
   }
 }
 
+/*
+ * Logo draw-in: R bowl, then R leg, then the bracket — ~600 ms in all.
+ * Starts with the header fade-in (hero intro, 200 ms). Paths use pathLength=1.
+ */
+.logo-draw path {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: logo-draw 260ms var(--ease-lab) forwards;
+}
+.logo-draw [data-stroke='r-bowl'] { animation-delay: 200ms; }
+.logo-draw [data-stroke='r-leg'] { animation-delay: 380ms; animation-duration: 180ms; }
+.logo-draw [data-stroke='bracket'] { animation-delay: 500ms; animation-duration: 300ms; }
+
+@keyframes logo-draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .logo-draw path {
+    animation: none;
+    stroke-dashoffset: 0;
+  }
+}
+
+/* Mobile menu: fade in, items rise 60 ms apart (index in --i) */
+.menu-enter {
+  animation: menu-fade 220ms var(--ease-lab) both;
+}
+.menu-item {
+  animation: menu-rise 420ms var(--ease-lab) both;
+  animation-delay: calc(var(--i, 0) * 60ms + 60ms);
+}
+
+@keyframes menu-fade {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes menu-rise {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .menu-enter,
+  .menu-item {
+    animation: none;
+  }
+}
+
 /* Scrollbar — flat, no gradient (spec §5) */
 ::-webkit-scrollbar {
   width: 8px;

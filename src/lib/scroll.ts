@@ -99,13 +99,55 @@ export function initSmoothScroll(onRefresh?: () => void): () => void {
   };
 }
 
+/** True while the hero is pinned (set by useHeroScroll); the header never hides then. */
+let heroPinned = false;
+export const setHeroPinned = (pinned: boolean) => {
+  heroPinned = pinned;
+};
+export const isHeroPinned = () => heroPinned;
+
+/**
+ * Locks page scrolling (e.g. full-screen menu): pauses Lenis and stops native
+ * scroll. `unlockScroll` restores both.
+ */
+export function lockScroll() {
+  lenis?.stop();
+  document.documentElement.style.overflow = 'hidden';
+}
+
+export function unlockScroll() {
+  document.documentElement.style.overflow = '';
+  lenis?.start();
+}
+
+/**
+ * True while a scroll started by navigation (links, "Enter the lab") is
+ * running, so the header doesn't treat it as the reader scrolling down.
+ */
+let navigating = false;
+let navigatingTimer: number | undefined;
+export const isNavigating = () => navigating;
+const endNavigating = () => {
+  window.clearTimeout(navigatingTimer);
+  // A beat after arrival, so the last scroll events still count as navigation
+  navigatingTimer = window.setTimeout(() => (navigating = false), 150);
+};
+
 /** Scroll to a document position, through Lenis when it is running. */
 export function scrollToPosition(top: number, { immediate = false } = {}) {
   const instant = immediate || prefersReducedMotion();
+  navigating = true;
+  window.clearTimeout(navigatingTimer);
   if (lenis) {
-    lenis.scrollTo(top, { duration: 1.4, immediate: instant, force: true });
+    lenis.scrollTo(top, { duration: 1.4, immediate: instant, force: true, onComplete: endNavigating });
+    if (instant) endNavigating();
   } else {
-    gsap.to(window, { duration: instant ? 0 : 1.2, scrollTo: top, ease: 'power2.inOut' });
+    gsap.to(window, {
+      duration: instant ? 0 : 1.2,
+      scrollTo: top,
+      ease: 'power2.inOut',
+      onComplete: endNavigating,
+    });
   }
 }
 
