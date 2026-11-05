@@ -47,7 +47,7 @@ const Contact = () => {
         gsap
           .timeline({ onComplete: resolve })
           .set(svg, { opacity: 1 })
-          .fromTo(line, { strokeDasharray: 1, strokeDashoffset: 1 }, { strokeDashoffset: 0, duration: 0.35, ease: EASE_LAB })
+          .fromTo(line, { strokeDasharray: 100, strokeDashoffset: 100 }, { strokeDashoffset: 0, duration: 0.35, ease: EASE_LAB })
           .fromTo(packet, { attr: { cx: x1, cy: y1 }, opacity: 1 }, { attr: { cx: x2, cy: y2 }, duration: 0.9, ease: 'power1.in' }, 0)
           .to(packet, { opacity: 0, duration: 0.15 })
           .to(ring, { attr: { 'stroke-opacity': 0.9, 'fill-opacity': 0.12 }, duration: 0.2, yoyo: true, repeat: 1, ease: 'sine.inOut' }, '<')
@@ -86,7 +86,7 @@ const Contact = () => {
 
       {/* Transmission overlay (line + packet), shown only while sending */}
       <svg ref={overlay} aria-hidden="true" className="pointer-events-none absolute inset-0 h-full w-full opacity-0">
-        <line stroke="rgb(156 201 255 / 0.5)" strokeWidth="1" pathLength={1} />
+        <line stroke="rgb(156 201 255 / 0.5)" strokeWidth="1" pathLength={100} />
         <circle r="5" fill="#EDF4FF" opacity="0" style={{ filter: 'drop-shadow(0 0 8px rgb(156 201 255 / 0.9))' }} />
       </svg>
 

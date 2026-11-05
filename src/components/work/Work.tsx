@@ -36,6 +36,9 @@ const Work = () => {
   const mode = belowMd ? 'stack' : sceneMode.mobile || sceneMode.reducedMotion ? 'native' : 'pin';
 
   useWorkScroll({ section, viewport, track, counter, fill, hint, edge }, mode);
+  // In pin mode Work slides up over the pinned hero, so its heading rises with
+  // the track as one block instead of revealing late (POLISH P1-6)
+  const reveal = (kind: 'lines' | 'fade') => (mode === 'pin' ? undefined : kind);
   useReveal(section);
 
   return (
@@ -51,24 +54,24 @@ const Work = () => {
       <div className="flex flex-col gap-7 md:grid md:flex-1 md:grid-cols-[minmax(0,320px)_1fr] md:items-center md:gap-12 md:pl-12 xl:grid-cols-[360px_1fr] xl:gap-16 xl:pl-16">
         {/* Left column */}
         <div className="relative z-10 flex flex-col gap-7">
-          <p data-reveal="fade" className="font-mono text-[10px] uppercase leading-none tracking-[0.12em] text-ink-tertiary md:hidden">
+          <p data-reveal={reveal('fade')} className="font-mono text-[10px] uppercase leading-none tracking-[0.12em] text-ink-tertiary md:hidden">
             {hud}
           </p>
-          <p data-reveal="fade" className="font-mono text-[11px] uppercase leading-none tracking-[0.14em] text-signal md:text-label">
+          <p data-reveal={reveal('fade')} className="font-mono text-[11px] uppercase leading-none tracking-[0.14em] text-signal md:text-label">
             Selected work
           </p>
           <h2
             id="work-title"
-            data-reveal="lines"
+            data-reveal={reveal('lines')}
             className="text-[34px] font-medium leading-[1.05] tracking-[-0.04em] text-ink-primary md:text-display-lg"
           >
             {TITLE.lead} <span className="text-ink-tertiary">{TITLE.trail}</span>
           </h2>
-          <p data-reveal="fade" className="max-w-[320px] text-[15px] leading-[1.55] text-ink-secondary md:text-body">
+          <p data-reveal={reveal('fade')} className="max-w-[320px] text-[15px] leading-[1.55] text-ink-secondary md:text-body">
             <span className="md:hidden">{LEAD_MOBILE}</span>
             <span className="hidden md:inline">{LEAD}</span>
           </p>
-          <div data-reveal="fade" className="hidden items-center gap-5 md:flex" aria-hidden="true">
+          <div data-reveal={reveal('fade')} className="hidden items-center gap-5 md:flex" aria-hidden="true">
             <span className="font-mono text-counter text-ink-primary">
               <span ref={counter}>01</span>
               <span className="ml-2 text-[14px] tracking-normal text-ink-tertiary">/ {total}</span>
