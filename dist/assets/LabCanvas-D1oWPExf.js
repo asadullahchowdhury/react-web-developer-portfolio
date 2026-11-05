@@ -1,4 +1,4 @@
-import{r as Se,j as $e,C as Gi,s as jt,B as aa,a as Gx,b as wg,W as oi,F as Ta,c as si,N as Bn,P as Nf,i as Wx,g as Xx,E as qx,h as Yx,L as ir,D as Eg}from"./index-fxHmE8kZ.js";function Zx(r){return r&&r.__esModule&&Object.prototype.hasOwnProperty.call(r,"default")?r.default:r}/**
+import{r as Se,j as $e,C as Gi,s as jt,B as aa,a as Gx,b as wg,W as oi,F as Ta,c as si,N as Bn,P as Nf,i as Wx,g as Xx,E as qx,h as Yx,L as ir,D as Eg}from"./index-Bo9bvbzQ.js";function Zx(r){return r&&r.__esModule&&Object.prototype.hasOwnProperty.call(r,"default")?r.default:r}/**
  * @license
  * Copyright 2010-2024 Three.js Authors
  * SPDX-License-Identifier: MIT
@@ -3968,8 +3968,10 @@ No matching component was found for:
   void main() {
     vec4 m = texture2D(uMask, vUv);
     float luma = dot(m.rgb, vec3(0.299, 0.587, 0.114));
-    // Floor of 35% so dark clothing still reads as part of the figure
-    float body = m.a * mix(0.35, 1.0, luma);
+    // Luminance stretched so skin reads clearly brighter than hair, shirt and
+    // sunglasses (the face needs that contrast to be recognisable); floor of
+    // 22% so dark clothing still reads as part of the figure
+    float body = m.a * mix(0.22, 1.0, smoothstep(0.04, 0.62, luma));
 
     // Rim: alpha drop to any neighbour within uEdge
     float n = min(
@@ -3983,8 +3985,9 @@ No matching component was found for:
     float s = mod(gl_FragCoord.y, pitch);
     float line = 1.0 - smoothstep(uPixelRatio * 0.6, uPixelRatio * 1.4, s);
 
-    // 15% at the top, full strength from 35% down
-    float fade = mix(0.15, 1.0, smoothstep(1.0, 0.65, vUv.y));
+    // Soft top edge only: 45% at the very top, full strength from 12% down,
+    // so the head (top quarter of the portrait) stays at near-full strength
+    float fade = mix(0.45, 1.0, smoothstep(1.0, 0.88, vUv.y));
 
     // Scan-in from the top
     float front = 1.0 - uReveal;
@@ -3992,7 +3995,9 @@ No matching component was found for:
     float scanning = step(0.001, uReveal) * step(uReveal, 0.999);
     float scanLine = (1.0 - smoothstep(0.0, 0.012, abs(vUv.y - front))) * scanning * m.a;
 
-    float alpha = (body * line * 0.9 + edge) * fade * revealed * uOpacity * uFlicker;
+    // Faint continuous fill between the lines carries the facial detail
+    float fill = body * body * 0.32;
+    float alpha = (body * line * 0.9 + fill + edge) * fade * revealed * uOpacity * uFlicker;
     alpha += scanLine * 0.9;
 
     vec3 color = mix(uColor, uRim, clamp(edge + scanLine, 0.0, 1.0));

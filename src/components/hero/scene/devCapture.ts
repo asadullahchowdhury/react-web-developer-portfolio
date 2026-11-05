@@ -12,7 +12,8 @@ import { sceneState } from './sceneState';
  *   await __labCapture('desktop', 1360, 1360)  // stage 680 × 680 at 2×
  *   await __labCapture('mobile', 780, 660)     // stage 390 × 330 at 2×
  *
- * Node labels are DOM text, so they are not part of the still.
+ * Node labels are DOM text, so they are not part of the still. The still
+ * has a real alpha channel (see the "unscreen" step below).
  */
 export function attachDevCapture(state: RootState) {
   const capture = async (variant: 'desktop' | 'mobile', width: number, height: number, quality = 0.82) => {
@@ -57,13 +58,34 @@ export function attachDevCapture(state: RootState) {
     camera.lookAt(...CAMERA.rest.lookAt);
     camera.updateProjectionMatrix();
 
-    // Opaque on pure black: additive light has almost no alpha, so a
-    // transparent still would lose it. The poster is shown with
-    // mix-blend-mode: screen, under which black is exactly invisible.
+    // Rendered opaque on pure black (additive light has almost no alpha of
+    // its own), then "unscreened" into a straight-alpha still: alpha = the
+    // brightest channel, colour divided by it. Composited normally, that
+    // matches the screen blend on a dark page — without needing a blend
+    // mode, which any faded ancestor would isolate into a black box.
     gl.setClearColor(0x000000, 1);
     gl.render(scene, camera);
-    const dataUrl = gl.domElement.toDataURL('image/webp', quality);
+    const still = document.createElement('canvas');
+    still.width = width;
+    still.height = height;
+    const ctx2d = still.getContext('2d')!;
+    ctx2d.drawImage(gl.domElement, 0, 0);
     gl.setClearColor(0x000000, 0);
+    const pixels = ctx2d.getImageData(0, 0, width, height);
+    const d = pixels.data;
+    for (let i = 0; i < d.length; i += 4) {
+      const a = Math.max(d[i], d[i + 1], d[i + 2]);
+      if (a === 0) {
+        d[i + 3] = 0;
+        continue;
+      }
+      d[i] = Math.round((d[i] * 255) / a);
+      d[i + 1] = Math.round((d[i + 1] * 255) / a);
+      d[i + 2] = Math.round((d[i + 2] * 255) / a);
+      d[i + 3] = a;
+    }
+    ctx2d.putImageData(pixels, 0, 0);
+    const dataUrl = still.toDataURL('image/webp', quality);
 
     // Restore
     pixelRatioUniforms.forEach(({ material, value }) => (material.uniforms.uPixelRatio.value = value));

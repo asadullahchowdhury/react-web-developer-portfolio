@@ -7,7 +7,8 @@
  *
  *  - horizontal 1px scanlines every `uLinePitch` CSS px
  *  - rim: outline found by sampling the mask's alpha around each pixel
- *  - vertical fade: 15% at the top → 100% at 35% down
+ *  - faint fill between the lines (brighter areas only) so the face reads
+ *  - vertical fade: 45% at the very top → 100% at 12% down
  *  - `uReveal` 0 → 1 scans the figure in from the top, with a bright front line
  *  - `uFlicker` multiplies the whole result (kept within 3% by the animation)
  */
@@ -35,8 +36,10 @@ export const hologramFragment = /* glsl */ `
   void main() {
     vec4 m = texture2D(uMask, vUv);
     float luma = dot(m.rgb, vec3(0.299, 0.587, 0.114));
-    // Floor of 35% so dark clothing still reads as part of the figure
-    float body = m.a * mix(0.35, 1.0, luma);
+    // Luminance stretched so skin reads clearly brighter than hair, shirt and
+    // sunglasses (the face needs that contrast to be recognisable); floor of
+    // 22% so dark clothing still reads as part of the figure
+    float body = m.a * mix(0.22, 1.0, smoothstep(0.04, 0.62, luma));
 
     // Rim: alpha drop to any neighbour within uEdge
     float n = min(
@@ -50,8 +53,9 @@ export const hologramFragment = /* glsl */ `
     float s = mod(gl_FragCoord.y, pitch);
     float line = 1.0 - smoothstep(uPixelRatio * 0.6, uPixelRatio * 1.4, s);
 
-    // 15% at the top, full strength from 35% down
-    float fade = mix(0.15, 1.0, smoothstep(1.0, 0.65, vUv.y));
+    // Soft top edge only: 45% at the very top, full strength from 12% down,
+    // so the head (top quarter of the portrait) stays at near-full strength
+    float fade = mix(0.45, 1.0, smoothstep(1.0, 0.88, vUv.y));
 
     // Scan-in from the top
     float front = 1.0 - uReveal;
@@ -59,7 +63,9 @@ export const hologramFragment = /* glsl */ `
     float scanning = step(0.001, uReveal) * step(uReveal, 0.999);
     float scanLine = (1.0 - smoothstep(0.0, 0.012, abs(vUv.y - front))) * scanning * m.a;
 
-    float alpha = (body * line * 0.9 + edge) * fade * revealed * uOpacity * uFlicker;
+    // Faint continuous fill between the lines carries the facial detail
+    float fill = body * body * 0.32;
+    float alpha = (body * line * 0.9 + fill + edge) * fade * revealed * uOpacity * uFlicker;
     alpha += scanLine * 0.9;
 
     vec3 color = mix(uColor, uRim, clamp(edge + scanLine, 0.0, 1.0));
