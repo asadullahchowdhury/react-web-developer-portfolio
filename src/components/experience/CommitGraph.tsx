@@ -1,4 +1,5 @@
 import type { Lane } from '../../data/experience';
+import { GRAPH_PATH_LENGTH } from './graphPath';
 
 export interface GraphNode {
   /** y of the card's date line, relative to the graph. */
@@ -15,6 +16,7 @@ interface CommitGraphProps {
 /** Lane x positions in the 120 px gutter (spec §20). */
 const LANE_X: Record<Lane, number> = { codevioso: 70, redishketch: 30 };
 const SIGNAL = 'rgb(156 201 255 / 0.45)';
+
 
 /**
  * Career as a git graph (spec §20): Redishketch (x 30) runs up from the
@@ -51,7 +53,7 @@ const CommitGraph = ({ nodes, height }: CommitGraphProps) => {
       {topRed && <line x1={cx} x2={cx} y1={mergeTop} y2={bottom} stroke="rgb(255 255 255 / 0.06)" />}
 
       {/* Drawn history line */}
-      <path data-graph-line d={path} fill="none" stroke={SIGNAL} strokeWidth="1.5" pathLength={1} />
+      <path data-graph-line d={path} fill="none" stroke={SIGNAL} strokeWidth="1.5" pathLength={GRAPH_PATH_LENGTH} />
 
       {/* Commit nodes */}
       {nodes.map((node, i) => {

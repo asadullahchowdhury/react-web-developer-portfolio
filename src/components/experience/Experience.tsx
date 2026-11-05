@@ -8,6 +8,7 @@ import { useReveal } from '../../hooks/useReveal';
 import { EASE_LAB, gsap } from '../../lib/motion';
 import { loadScrollLibs } from '../../lib/scroll';
 import CommitGraph, { type GraphNode } from './CommitGraph';
+import { GRAPH_PATH_LENGTH } from './graphPath';
 import RoleCard from './RoleCard';
 
 const TITLE = { lead: 'From frontend', trail: 'to the full stack.' };
@@ -63,10 +64,10 @@ const Experience = () => {
       const ctx = gsap.context(() => {
         const line = el.parentElement?.querySelector<SVGPathElement>('[data-graph-line]');
         if (line) {
-          gsap.set(line, { strokeDasharray: 1 });
+          gsap.set(line, { strokeDasharray: GRAPH_PATH_LENGTH });
           gsap.fromTo(
             line,
-            { strokeDashoffset: 1 },
+            { strokeDashoffset: GRAPH_PATH_LENGTH },
             {
               strokeDashoffset: 0,
               ease: 'none',

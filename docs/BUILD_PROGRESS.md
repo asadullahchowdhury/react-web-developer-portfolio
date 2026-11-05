@@ -85,6 +85,8 @@
 | P0-2 Work counter | ☑ | Current card = most visible width inside the window; "Scroll →" fades out at the last card. Same logic in the native-scroll mode. |
 | P0-3 No placeholders | ☑ | `PUBLISHED_PROJECTS` renders only projects with title, description, category, path label and image; counter shows `/ 02`, pin is 1 × 100vh. Also hid the hero's screen-reader scene description while it is `[PLACEHOLDER]`. No `[PLACEHOLDER]` text left in the DOM (390 and 1440). |
 | P0-4 CAFM screenshot | ☑ (interim) | Re-cut from the original 1919 × 927 capture: cropped to the left 1272 × 727 (drops the Action Center with the customer name, the to-do list with test entries and the user menu), then blurred the client logo, the company name and the remaining test titles ("asdas"). 37 KB WebP. A clean capture with demo data is still wanted (Open items). |
+| P0-5 Unconfirmed years | ☑ (no change) | Kept "2022 — 2024" / "2021 — 2022" with `// TODO confirm` and `periodConfirmed: false`; Open items entry kept. |
+| Owner report: Experience line popped in | ☑ | The graph line used `pathLength=1`; GSAP rounds px while tweening `stroke-dashoffset`, so it jumped from hidden to drawn at 50%. Now `pathLength=1000`: offset goes 989 → 788 → 586 → 384 → 183 → 0 across the scroll (checked at 1440). |
 | P1-7 Screenshot treatment | ☑ | Done with P0-4: images at saturate 0.85 / brightness 0.88, full colour + scale 1.03 on hover or keyboard focus (300 ms ease-lab, no scale with reduced motion), inner top shadow under the 34 px bar and a 1 px `rgba(255,255,255,0.06)` inner border. |
 
 ## Open items (content needed from Rahat)
