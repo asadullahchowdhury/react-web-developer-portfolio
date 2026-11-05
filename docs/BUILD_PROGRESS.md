@@ -84,6 +84,8 @@
 | P0-1 Work cards under heading | ☑ | Track window clips at the left column's edge (`overflow-x: clip`), 64 px void fade appears once the track moves; cards fade to 40% as half of them leaves. Checked at 5 pin positions (1440): card left edges never cross the column (column ends 424, window starts 488). |
 | P0-2 Work counter | ☑ | Current card = most visible width inside the window; "Scroll →" fades out at the last card. Same logic in the native-scroll mode. |
 | P0-3 No placeholders | ☑ | `PUBLISHED_PROJECTS` renders only projects with title, description, category, path label and image; counter shows `/ 02`, pin is 1 × 100vh. Also hid the hero's screen-reader scene description while it is `[PLACEHOLDER]`. No `[PLACEHOLDER]` text left in the DOM (390 and 1440). |
+| P0-4 CAFM screenshot | ☑ (interim) | Re-cut from the original 1919 × 927 capture: cropped to the left 1272 × 727 (drops the Action Center with the customer name, the to-do list with test entries and the user menu), then blurred the client logo, the company name and the remaining test titles ("asdas"). 37 KB WebP. A clean capture with demo data is still wanted (Open items). |
+| P1-7 Screenshot treatment | ☑ | Done with P0-4: images at saturate 0.85 / brightness 0.88, full colour + scale 1.03 on hover or keyboard focus (300 ms ease-lab, no scale with reduced motion), inner top shadow under the 34 px bar and a 1 px `rgba(255,255,255,0.06)` inner border. |
 
 ## Open items (content needed from Rahat)
 - Project 03 details + screenshot

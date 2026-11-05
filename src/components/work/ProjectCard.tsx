@@ -13,6 +13,8 @@ interface ProjectCardProps {
  *
  * Hover (fine pointer): lifts 4 px, border 16%, background #0E131B, image
  * scales to 1.03, arrow button fills. 240 ms ease-lab. Off with reduced motion.
+ * Screenshots are toned down (saturate 0.85, brightness 0.88) and return to
+ * full colour on hover or keyboard focus (300 ms ease-lab).
  */
 const ProjectCard = ({ project, index }: ProjectCardProps) => {
   const number = String(index + 1).padStart(2, '0');
@@ -44,9 +46,14 @@ const ProjectCard = ({ project, index }: ProjectCardProps) => {
               decoding="async"
               width={1600}
               height={1000}
-              className="h-full w-full object-cover object-top transition-transform duration-[240ms] ease-lab motion-reduce:transition-none [@media(hover:hover)_and_(pointer:fine)]:group-hover:scale-[1.03] motion-reduce:group-hover:scale-100"
+              className="h-full w-full object-cover object-top brightness-[0.88] saturate-[0.85] transition-[transform,filter] duration-300 ease-lab motion-reduce:transition-none group-focus-visible:scale-[1.03] group-focus-visible:brightness-100 group-focus-visible:saturate-100 group-has-[a:focus-visible]:scale-[1.03] group-has-[a:focus-visible]:brightness-100 group-has-[a:focus-visible]:saturate-100 [@media(hover:hover)_and_(pointer:fine)]:group-hover:scale-[1.03] [@media(hover:hover)_and_(pointer:fine)]:group-hover:brightness-100 [@media(hover:hover)_and_(pointer:fine)]:group-hover:saturate-100 motion-reduce:group-hover:scale-100 motion-reduce:group-focus-visible:scale-100 motion-reduce:group-has-[a:focus-visible]:scale-100"
             />
           )}
+          {/* Inner top shadow under the bar + 1 px inner border so light UIs don't glare or bleed */}
+          <span
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-0 shadow-[inset_0_10px_14px_-8px_rgba(0,0,0,0.55),inset_0_0_0_1px_rgba(255,255,255,0.06)]"
+          />
         </div>
       </div>
 
