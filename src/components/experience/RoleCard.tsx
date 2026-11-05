@@ -39,11 +39,12 @@ const RoleCard = ({ role }: { role: Role }) => (
     </p>
     <p className="max-w-[640px] text-[14px] leading-[1.6] text-ink-secondary md:text-[15px]">{role.description}</p>
     {role.highlights.length > 0 && (
-      <ul className="mt-1 flex flex-col gap-1.5 text-[14px] text-ink-secondary">
+      // Highlights read like commit messages (POLISH P2-18); real content only
+      <ul aria-label="Highlights" className="mt-1 flex flex-col gap-1.5 font-mono text-[13px] leading-[1.5] text-ink-secondary">
         {role.highlights.map((h) => (
-          <li key={h} className="flex gap-2">
-            <span aria-hidden="true" className="text-signal">·</span>
-            {h}
+          <li key={h} className="flex gap-2.5">
+            <span aria-hidden="true" className="text-signal">→</span>
+            <span>{h}</span>
           </li>
         ))}
       </ul>
