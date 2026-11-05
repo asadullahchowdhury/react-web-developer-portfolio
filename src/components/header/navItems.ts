@@ -1,4 +1,5 @@
 /** Site navigation — one list for the desktop header and the mobile menu. */
+import { SITE } from '../../data/site';
 
 export interface NavItem {
   number: string;
@@ -22,11 +23,7 @@ export const SECTION_IDS = NAV_ITEMS.map((i) => i.target);
 
 export const CONTACT_TARGET = 'contact';
 
-export const SOCIAL_LINKS = [
-  { label: 'GitHub', href: 'https://github.com/asadullahchowdhury' },
-  { label: 'LinkedIn', href: 'https://www.linkedin.com/in/chowdhuryrahat' },
-  { label: 'Résumé', href: '/assets/resume.pdf' },
-] as const;
+export { SOCIAL_LINKS } from '../../data/site';
 
 /** Same wording as the hero HUD (spec §2.2). */
-export const STATUS_TEXT = 'Open to product work & freelance';
+export const STATUS_TEXT = SITE.status;

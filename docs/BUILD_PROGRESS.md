@@ -2,8 +2,8 @@
 
 | Phase | Status | Commit | Notes |
 |---|---|---|---|
-| 0 Preflight | ☑ | (this commit) | Inventory below; build passes |
-| 1 Foundation | ☐ | | |
+| 0 Preflight | ☑ | 0eac261 | Inventory below; build passes |
+| 1 Foundation | ☑ | (this commit) | Data files, useReducedMotion, useReveal, SectionHeader, chapter helper |
 | 2 Work | ☐ | | |
 | 3 About | ☐ | | |
 | 4 Stack | ☐ | | |
@@ -36,6 +36,9 @@
 - No artboard images exist in `docs/`; visual checks compare against the spec's measurements.
 - Playwright and Lighthouse are not installed. Visual checks use the Claude browser pane (screenshots are inspected but cannot be saved to `docs/screens/`); Lighthouse is run with `npx lighthouse` in Phase 8.
 - `public/assets/images/cafm-platform.png` is the original CAFM dashboard screenshot, kept on the owner's explicit instruction until an anonymised one is supplied. It still shows the client logo and a customer name (see Open items).
+
+- Phase 1: tokens, fonts, section order, Lenis/ScrollTrigger (single lazy instance) and the removed hero-era components were already in place from the hero work. Added `src/data/{site,projects,experience,stack}.ts`, `useReducedMotion`, `useReveal` (masked line rise + 12 px fade-up, once at 20% into view, nothing hidden with reduced motion), `SectionHeader` and `chapterLabel()` (§2.3 mapping). Header socials/status now read from `data/site.ts`.
+- Phase 1: AOS stays for the not-yet-redesigned sections and is removed in Phase 7.
 
 ## Open items (content needed from Rahat)
 - Project 03 details + screenshot
