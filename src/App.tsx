@@ -1,6 +1,4 @@
 import { useEffect } from 'react';
-import AOS from 'aos';
-import 'aos/dist/aos.css';
 import Header from './components/Header';
 import Hero from './components/hero/Hero';
 import About from './components/about/About';
@@ -12,20 +10,11 @@ import Footer from './components/footer/Footer';
 import { initSmoothScroll } from './lib/scroll';
 
 function App() {
-  useEffect(() => {
-    AOS.init({
-      duration: 800,
-      easing: 'ease-out-cubic',
-      once: true,
-      offset: 120,
-      delay: 100,
-    });
-    // Pins change the page height, so AOS re-measures after each refresh
-    return initSmoothScroll(() => AOS.refresh());
-  }, []);
+  // Lenis + ScrollTrigger (lazy, after first paint)
+  useEffect(() => initSmoothScroll(), []);
 
   return (
-    <div className="min-h-screen bg-background-primary">
+    <div className="min-h-screen bg-void">
       <Header />
       <main>
         <Hero />

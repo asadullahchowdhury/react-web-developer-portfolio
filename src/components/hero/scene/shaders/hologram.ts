@@ -35,7 +35,8 @@ export const hologramFragment = /* glsl */ `
   void main() {
     vec4 m = texture2D(uMask, vUv);
     float luma = dot(m.rgb, vec3(0.299, 0.587, 0.114));
-    float body = m.a * luma;
+    // Floor of 35% so dark clothing still reads as part of the figure
+    float body = m.a * mix(0.35, 1.0, luma);
 
     // Rim: alpha drop to any neighbour within uEdge
     float n = min(

@@ -4,18 +4,15 @@ import { useReducedMotion } from '../../hooks/useReducedMotion';
 import { EASE_LAB, gsap } from '../../lib/motion';
 import { loadScrollLibs } from '../../lib/scroll';
 
-/** Real portrait (spec §14) — null until the owner supplies it. */
-const PORTRAIT_SRC: string | null = null;
+/** Real portrait (spec §14), 4:5, re-encoded from docs/source-assets/. */
+const PORTRAIT = { src: '/assets/images/portrait-about.webp', width: 960, height: 1200 };
 
 /**
  * About portrait (spec §17): 4:5 figure, radius 18, graphite fill, 1 px
  * border in the hologram's signal blue, mono caption row.
  *
- * Until the real portrait exists it shows the outlined placeholder: the
- * hologram's head-and-shoulders silhouette drawn as faint scanlines.
- *
  * Entrance (once, at 20% into view): a bright scanline sweeps top → bottom
- * while the image is revealed behind it — the hologram "becomes" the person.
+ * while the photo is revealed behind it — the hologram "becomes" the person.
  * None of this with reduced motion.
  */
 const Portrait = () => {
@@ -60,35 +57,17 @@ const Portrait = () => {
 
   return (
     <figure ref={figure} className="flex w-full flex-col gap-3">
-      <div className="relative h-[400px] overflow-hidden rounded-[18px] border border-[rgb(156_201_255/0.22)] bg-graphite md:h-auto md:aspect-[4/5]">
+      <div className="relative h-[400px] overflow-hidden rounded-[18px] border border-[rgb(156_201_255/0.22)] bg-graphite md:aspect-[4/5] md:h-auto">
         <div data-portrait-media className="absolute inset-0">
-          {PORTRAIT_SRC ? (
-            <img
-              src={PORTRAIT_SRC}
-              alt="Rahat Chowdhury"
-              loading="lazy"
-              decoding="async"
-              className="h-full w-full object-cover object-top"
-            />
-          ) : (
-            <div
-              role="img"
-              aria-label="Portrait placeholder"
-              className="absolute inset-x-[14%] bottom-0 top-[12%]"
-              style={{
-                background:
-                  'repeating-linear-gradient(to bottom, rgb(var(--signal-rgb) / 0.32) 0 1px, transparent 1px 5px)',
-                maskImage: 'url(/assets/lab/hologram-mask.svg)',
-                WebkitMaskImage: 'url(/assets/lab/hologram-mask.svg)',
-                maskSize: 'contain',
-                WebkitMaskSize: 'contain',
-                maskRepeat: 'no-repeat',
-                WebkitMaskRepeat: 'no-repeat',
-                maskPosition: 'bottom center',
-                WebkitMaskPosition: 'bottom center',
-              }}
-            />
-          )}
+          <img
+            src={PORTRAIT.src}
+            alt="Rahat Chowdhury"
+            width={PORTRAIT.width}
+            height={PORTRAIT.height}
+            loading="lazy"
+            decoding="async"
+            className="h-full w-full object-cover object-top"
+          />
         </div>
         <span
           data-portrait-sweep

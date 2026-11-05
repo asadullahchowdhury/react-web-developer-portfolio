@@ -8,8 +8,8 @@
 | 3 About | ☑ | d16afaa | Statement, portrait placeholder + scanline sweep, facts, principles |
 | 4 Stack | ☑ | 0010aa4 | Exploded isometric diagram, 160vh pin, mini diagram + cards on mobile |
 | 5 Experience | ☑ | 3833f96 | Commit graph aligned to cards (1280–1920), top-down draw, mobile timeline |
-| 6 Contact + Footer | ☑ | (this commit) | Glass form + packet send, mocked send verified, footer wordmark |
-| 7 Integration & polish | ☐ | | |
+| 6 Contact + Footer | ☑ | 7850a44 | Glass form + packet send, mocked send verified, footer wordmark |
+| 7 Integration & polish | ☑ | (this commit) | AOS + legacy tokens removed, real portraits, meta/OG, scroll restoration |
 | 8 QA & report | ☐ | | |
 
 ## Inventory (Phase 0)
@@ -65,12 +65,18 @@
 - Phase 6: no real email was sent during the build (that would message the owner). Success and error states were verified with a dev-only `?mockSend=ok|fail` switch (stripped from production). Real send is untested — see Open items.
 - Phase 6: copy not given by the spec — the success line reuses the old form's "Message sent successfully."; validation messages are "Please enter your name." / "Please enter a valid email address." / "Please add a short message.".
 - Phase 6: the send animation draws a line from the button to the platform ellipse, moves a glowing packet along it (~900 ms) and pulses the inner ellipse once; reduced motion skips it. Footer © row uses the current year (2026 now, per spec).
+- Phase 7: the owner added two portraits to `public/assets/images/` during the build. `portrait-about.webp` was really a 2 MB PNG; it is re-encoded to a 960 × 1200 WebP (41 KB) and used in About. `potrait-hologram.png` (447 × 558, transparent) is now the hologram mask at `public/assets/lab/portrait-hologram.png`; the hologram plane follows its aspect ratio, and the scanline brightness has a 35% floor so the dark shirt still reads. Both originals are kept, untouched, in `docs/source-assets/` (not shipped). Scene posters were re-rendered with the new hologram.
+- Phase 7: removed AOS (package, init, CSS), the legacy colour aliases (`background-*`, `foreground-*`, `accent`, `--bg-primary`, `--card-bg`, shadows), `ui-card`/`ui-chip`, the old Contact contrast patch, the placeholder hologram mask, `getSceneCapabilities`, and unused images (`barberly-tab.png`, `me.jpg`, `me 1.jpg` 6.8 MB, `meta-logo-rahat.webp`).
+- Phase 7: `index.html` — title "Rahat Chowdhury — Full-Stack Developer", description from the hero lead, Open Graph + Twitter tags, `og-image.png` 1200 × 630 rendered from the hero (label, name, spec headline, lab scene with the hologram). OG image URLs are relative until the production domain is known (Open items).
+- Phase 7: manual scroll restoration — the browser restored reloads too high because pins and the hero runway add height after load (5416 → 4152). The position is now saved on `pagehide` and restored after ScrollTrigger's post-fonts/images refresh, on reload and back/forward only. Verified: reload at 5416 returns to 5416.
+- Phase 7: pin sequence verified with no overlap — hero 822→1588, Work 1588→2284 (starts exactly at the hero pin end), Stack 4081→4638 (starts at its section top). Chapter counters: 01 hero, 02 Work, 03 About/Stack/Experience, 04 Contact.
 - Verification note: the Claude browser pane often runs this tab at 0–2 frames per second, so time-based animations (entrances, scrubs) were checked by state (start state applied, trigger fires, end values after settling) rather than watched live.
 
 ## Open items (content needed from Rahat)
 - Project 03 details + screenshot
 - CAFM anonymised screenshot (the current image shows the client logo and a customer name)
-- Portrait (hologram + About)
+- Portrait: supplied and in use. For a sharper hologram, a larger head-and-shoulders cut-out (≥ 1600 px tall, spec §14) would help; the current one is 447 × 558 and waist-length.
+- Production domain, so `og:image` / `twitter:image` can be absolute URLs
 - Redishketch years; provable highlights per role
 - Hero scene description for screen readers (currently `[PLACEHOLDER]`)
 - Résumé PDF: check it never mentions the client name (its text can't be scanned automatically)

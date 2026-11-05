@@ -94,9 +94,43 @@ function saveAppIcons(): Plugin {
   };
 }
 
+/**
+ * Dev-server only: saves derived site images (resized / re-encoded in the
+ * browser from originals in docs/source-assets/). Fixed names only.
+ */
+const IMAGE_TARGETS: Record<string, string> = {
+  'portrait-about.webp': fileURLToPath(new URL('./public/assets/images/', import.meta.url)),
+  'og-image.png': fileURLToPath(new URL('./public/', import.meta.url)),
+};
+
+function saveSiteImages(): Plugin {
+  return {
+    name: 'dev-save-site-images',
+    apply: 'serve',
+    configureServer(server) {
+      server.middlewares.use('/__dev/save-image', (req, res) => {
+        const name = String(req.headers['x-name'] ?? '');
+        const dir = IMAGE_TARGETS[name];
+        if (req.method !== 'POST' || !dir) {
+          res.statusCode = 400;
+          res.end('bad request');
+          return;
+        }
+        const chunks: Buffer[] = [];
+        req.on('data', (c: Buffer) => chunks.push(c));
+        req.on('end', () => {
+          const data = Buffer.concat(chunks);
+          writeFileSync(dir + name, data);
+          res.end(`saved ${name} (${data.length} bytes)`);
+        });
+      });
+    },
+  };
+}
+
 // https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [react(), preloadFonts(), saveScenePoster(), saveAppIcons()],
+  plugins: [react(), preloadFonts(), saveScenePoster(), saveAppIcons(), saveSiteImages()],
   optimizeDeps: {
     exclude: ['lucide-react'],
   },

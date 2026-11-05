@@ -46,17 +46,3 @@ export function supportsWebGL(): boolean {
   }
   return webglSupport;
 }
-
-export interface SceneCapabilities {
-  webgl: boolean;
-  reducedMotion: boolean;
-  mobile: boolean;
-  finePointer: boolean;
-}
-
-export const getSceneCapabilities = (): SceneCapabilities => ({
-  webgl: supportsWebGL(),
-  reducedMotion: prefersReducedMotion(),
-  mobile: isMobileLike(),
-  finePointer: hasFinePointer(),
-});

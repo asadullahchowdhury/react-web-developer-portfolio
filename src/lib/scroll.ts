@@ -50,6 +50,16 @@ export function registerScrollTarget(id: string, resolve: () => number): () => v
   };
 }
 
+const SCROLL_KEY = `scroll:${window.location.pathname}`;
+
+/** Saved position to restore — only on reload or back/forward, never on a fresh visit. */
+function takeSavedScroll(): number | null {
+  const nav = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming | undefined;
+  const saved = sessionStorage.getItem(SCROLL_KEY);
+  if (!saved || !nav || (nav.type !== 'reload' && nav.type !== 'back_forward')) return null;
+  return Number(saved) || 0;
+}
+
 /**
  * Smooth scrolling with Lenis, driven by GSAP's ticker and kept in sync with
  * ScrollTrigger (spec §11). Off with reduced motion. Also refreshes
@@ -58,7 +68,7 @@ export function registerScrollTarget(id: string, resolve: () => number): () => v
  *
  * Returns a cleanup function.
  */
-export function initSmoothScroll(onRefresh?: () => void): () => void {
+export function initSmoothScroll(): () => void {
   let cancelled = false;
   const cleanups: (() => void)[] = [];
 
@@ -79,19 +89,29 @@ export function initSmoothScroll(onRefresh?: () => void): () => void {
       });
     }
 
-    if (onRefresh) {
-      ScrollTrigger.addEventListener('refresh', onRefresh);
-      cleanups.push(() => ScrollTrigger.removeEventListener('refresh', onRefresh));
-    }
-
-    const refresh = () => ScrollTrigger.refresh();
-    document.fonts?.ready.then(() => !cancelled && refresh());
-    if (document.readyState === 'complete') refresh();
-    else {
-      window.addEventListener('load', refresh, { once: true });
-      cleanups.push(() => window.removeEventListener('load', refresh));
-    }
+    // Refresh once fonts and images are in, then put the reader back where
+    // they were on reload / back-forward (pins change the page height, so the
+    // browser's own restoration lands too high)
+    const loaded = new Promise<void>((resolve) => {
+      if (document.readyState === 'complete') resolve();
+      else window.addEventListener('load', () => resolve(), { once: true });
+    });
+    Promise.all([document.fonts?.ready ?? Promise.resolve(), loaded]).then(() => {
+      if (cancelled) return;
+      ScrollTrigger.refresh();
+      const saved = takeSavedScroll();
+      if (saved !== null) {
+        scrollToPosition(saved, { immediate: true });
+        ScrollTrigger.update();
+      }
+    });
   });
+
+  // Manual scroll restoration: remember the position when leaving the page
+  if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+  const save = () => sessionStorage.setItem(SCROLL_KEY, String(Math.round(window.scrollY)));
+  window.addEventListener('pagehide', save);
+  cleanups.push(() => window.removeEventListener('pagehide', save));
 
   return () => {
     cancelled = true;
