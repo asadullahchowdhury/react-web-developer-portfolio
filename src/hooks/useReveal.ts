@@ -3,13 +3,31 @@ import { EASE_LAB, gsap, SplitText } from '../lib/motion';
 import { loadScrollLibs } from '../lib/scroll';
 import { useReducedMotion } from './useReducedMotion';
 
-/** Entrances start once the element is 20% into the viewport (spec §18). */
-const START = 'top 80%';
+/**
+ * Entrances start once the element is 15% into the viewport (spec §18 says
+ * 20%; POLISH P1-10 moved it earlier so blocks never sit empty).
+ */
+const START = 'top 85%';
+
+/**
+ * The `data-reveal="fade"` siblings directly above a heading (HUD line,
+ * eyebrow). They reveal together with the heading, never on their own.
+ */
+const leadingFades = (heading: HTMLElement): HTMLElement[] => {
+  const group: HTMLElement[] = [];
+  let el = heading.previousElementSibling;
+  while (el instanceof HTMLElement && el.dataset.reveal === 'fade') {
+    group.unshift(el);
+    el = el.previousElementSibling;
+  }
+  return group;
+};
 
 /**
  * Section entrances (spec §18), triggered once:
  *  - `[data-reveal="lines"]`: each rendered line rises inside a mask, 80 ms stagger
- *    (same as the hero H1);
+ *    (same as the hero H1). Fade elements right above it (eyebrow, HUD line)
+ *    join its group and fade in with it, triggered by the first of them;
  *  - `[data-reveal="fade"]`: fades up 12 px, 60 ms stagger between elements
  *    that enter together.
  * With reduced motion nothing is hidden or animated.
@@ -29,23 +47,32 @@ export function useReveal(scope: RefObject<HTMLElement>) {
     const setup = () => loadScrollLibs().then(({ ScrollTrigger }) => {
       if (cancelled) return;
       const ctx = gsap.context(() => {
+        const grouped = new Set<HTMLElement>();
         root.querySelectorAll<HTMLElement>('[data-reveal="lines"]').forEach((el) => {
+          const partners = leadingFades(el);
+          partners.forEach((p) => grouped.add(p));
+          if (partners.length) gsap.set(partners, { opacity: 0, y: 12 });
+          // First partner that is laid out (some are mobile- or desktop-only)
+          const trigger = partners.find((p) => p.offsetParent !== null) ?? el;
+
           SplitText.create(el, {
             type: 'lines',
             mask: 'lines',
             autoSplit: true,
-            onSplit: (self) =>
-              gsap.from(self.lines, {
-                yPercent: 100,
-                duration: 0.8,
-                stagger: 0.08,
-                ease: EASE_LAB,
-                scrollTrigger: { trigger: el, start: START, once: true },
-              }),
+            onSplit: (self) => {
+              const tl = gsap.timeline({ scrollTrigger: { trigger, start: START, once: true } });
+              if (partners.length) {
+                tl.to(partners, { opacity: 1, y: 0, duration: 0.6, stagger: 0.06, ease: EASE_LAB }, 0);
+              }
+              tl.from(self.lines, { yPercent: 100, duration: 0.8, stagger: 0.08, ease: EASE_LAB }, partners.length ? 0.06 : 0);
+              return tl;
+            },
           });
         });
 
-        const fades = gsap.utils.toArray<HTMLElement>('[data-reveal="fade"]', root);
+        const fades = gsap.utils
+          .toArray<HTMLElement>('[data-reveal="fade"]', root)
+          .filter((el) => !grouped.has(el));
         if (fades.length) {
           gsap.set(fades, { opacity: 0, y: 12 });
           ScrollTrigger.batch(fades, {
