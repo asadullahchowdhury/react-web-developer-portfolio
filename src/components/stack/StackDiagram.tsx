@@ -104,17 +104,27 @@ const StackDiagram = forwardRef<SVGSVGElement, StackDiagramProps>(
               onPointerEnter={onHover ? () => onHover(i) : undefined}
               onPointerLeave={onHover ? () => onHover(null) : undefined}
             >
-              <polygon points={pts.left} fill="#0B0F15" stroke="rgb(255 255 255 / 0.10)" />
-              <polygon points={pts.right} fill="#090C11" stroke="rgb(255 255 255 / 0.10)" />
+              <polygon points={pts.left} fill="#0B0F15" stroke="rgb(255 255 255 / 0.18)" />
+              <polygon points={pts.right} fill="#090C11" stroke="rgb(255 255 255 / 0.18)" />
               <polygon
                 points={pts.top}
                 fill={isActive ? '#121A26' : '#0E131B'}
-                stroke={isActive ? '#9CC9FF' : 'rgb(255 255 255 / 0.14)'}
+                stroke={isActive ? '#9CC9FF' : 'rgb(255 255 255 / 0.18)'}
                 strokeWidth={isActive ? 1.5 : 1}
                 style={{ transition: 'fill 240ms, stroke 240ms' }}
               />
               {isActive && <polygon points={pts.top} fill={`url(#${patternId})`} />}
               {isActive && <circle r={g.labels ? 4 : 3} fill="#EDEFF3" />}
+              {/* "Assembled" glow, pulsed once by useStackScroll at the end of the pin */}
+              <polygon
+                data-stack-glow
+                points={pts.top}
+                fill="rgb(156 201 255 / 0.08)"
+                stroke="#9CC9FF"
+                strokeWidth="1.5"
+                opacity="0"
+                style={{ filter: 'drop-shadow(0 0 8px rgb(156 201 255 / 0.8))' }}
+              />
             </g>
           );
         })}
@@ -128,7 +138,9 @@ const StackDiagram = forwardRef<SVGSVGElement, StackDiagramProps>(
             <g
               key={layer.number}
               data-stack-label={i}
-              style={{ opacity: i === active || !dimInactive ? 1 : 0.35, transition: 'opacity 240ms' }}
+              // In the scroll sequence useStackScroll owns the opacity (a React value
+              // here would reset it on every re-render)
+              style={{ opacity: dimInactive ? undefined : 1, transition: 'opacity 240ms' }}
             >
               <polyline
                 data-stack-leader={i}

@@ -1,7 +1,7 @@
 import { type RefObject, useEffect } from 'react';
 import { gsap } from '../../lib/motion';
 import { loadScrollLibs, setPinActive } from '../../lib/scroll';
-import type { DiagramGeometry } from './stackGeometry';
+import { type DiagramGeometry, INACTIVE_LABEL_OPACITY } from './stackGeometry';
 
 /** Pin length (spec §19). */
 const PIN_VH = 1.6;
@@ -17,7 +17,8 @@ const smoothstep = (t: number) => {
  * Stack scroll sequence (spec §19, desktop): pins the section for 160vh,
  * scrubbed. Each quarter activates the next layer (01 → 04) and the packet
  * travels down to it; in the last 20% the slabs compress from 150 px to
- * 24 px apart and every label becomes fully visible.
+ * 24 px apart and every label becomes fully visible; once assembled, all
+ * four slabs glow once (400 ms).
  *
  * Positions are written straight to the SVG; `onActive` fires only when the
  * active layer changes. `onProgress` drives the footer progress line.
@@ -41,7 +42,11 @@ export function useStackScroll(
     const labels = Array.from(diagram.querySelectorAll<SVGGElement>('[data-stack-label]'));
     const packet = diagram.querySelector<SVGCircleElement>('[data-stack-packet]');
     const spine = diagram.querySelector<SVGLineElement>('[data-stack-spine]');
+    const glows = Array.from(diagram.querySelectorAll<SVGPolygonElement>('[data-stack-glow]'));
     let lastActive = -1;
+    // The glow pulses once when the stack is fully assembled; re-armed after
+    // scrolling back out of the compression
+    let pulsed = false;
 
     const paint = (p: number) => {
       const c = smoothstep((p - COMPRESS_FROM) / (1 - COMPRESS_FROM));
@@ -68,11 +73,22 @@ export function useStackScroll(
       const packetY = ys[k] + (ys[k + 1] - ys[k]) * (along - k);
       packet?.setAttribute('cy', String(packetY));
 
-      // Inactive labels at 35% until the stack assembles, then all visible
+      // Inactive labels dimmed until the stack assembles, then all visible
       labels.forEach((label) => {
         const i = Number(label.dataset.stackLabel);
-        label.style.opacity = String(i === active ? 1 : Math.max(0.35, c));
+        label.style.opacity = String(i === active ? 1 : Math.max(INACTIVE_LABEL_OPACITY, c));
       });
+
+      if (c >= 0.98 && !pulsed) {
+        pulsed = true;
+        gsap.fromTo(
+          glows,
+          { opacity: 0 },
+          { opacity: 1, duration: 0.2, ease: 'power1.out', yoyo: true, repeat: 1, overwrite: true },
+        );
+      } else if (c < 0.5 && pulsed) {
+        pulsed = false;
+      }
 
       if (active !== lastActive) {
         lastActive = active;

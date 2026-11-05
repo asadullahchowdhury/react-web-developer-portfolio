@@ -48,3 +48,6 @@ export const MINI_GEOMETRY: DiagramGeometry = {
   compressed: spreadFrom(60, 30),
   labels: false,
 };
+
+/** Labels of layers that aren't active during the scroll sequence (POLISH P1-9). */
+export const INACTIVE_LABEL_OPACITY = 0.55;
