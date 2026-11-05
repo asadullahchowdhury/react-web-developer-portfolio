@@ -9,7 +9,9 @@ const PORTRAIT = { src: '/assets/images/portrait-about.webp', width: 960, height
 
 /**
  * About portrait (spec §17): 4:5 figure, radius 18, graphite fill, 1 px
- * border in the hologram's signal blue, mono caption row.
+ * border in the hologram's signal blue, mono caption row. The photo is graded
+ * with a radial vignette to the void colour so its light studio backdrop
+ * doesn't become the brightest block on the page.
  *
  * Entrance (once, at 20% into view): a bright scanline sweeps top → bottom
  * while the photo is revealed behind it — the hologram "becomes" the person.
@@ -66,7 +68,12 @@ const Portrait = () => {
             height={PORTRAIT.height}
             loading="lazy"
             decoding="async"
-            className="h-full w-full object-cover object-top"
+            className="h-full w-full object-cover object-top brightness-[0.92]"
+          />
+          {/* Grade: the light studio backdrop falls off to the page void at the edges */}
+          <span
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_70%_62%_at_50%_40%,rgb(7_9_13/0)_40%,rgb(7_9_13/0.72)_78%,#07090D_100%)]"
           />
         </div>
         <span

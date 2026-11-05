@@ -89,6 +89,7 @@
 | Owner report: Experience line popped in | ☑ | The graph line used `pathLength=1`; GSAP rounds px while tweening `stroke-dashoffset`, so it jumped from hidden to drawn at 50%. Now `pathLength=1000`: offset goes 989 → 788 → 586 → 384 → 183 → 0 across the scroll (checked at 1440). |
 | Contact send line | ☑ | Same rounding bug as the Experience line (`pathLength=1` tweened by GSAP); now 100. |
 | P1-6 Hero → Work hand-off | ☑ (v1) | Hero HUD counter fades at p 0.35–0.45 (the `02 / 04` swap is removed), so it is gone before Work and its own `02 / 04` line start rising at p ≈ 0.55. In pin mode the Work heading, eyebrow, lead and counter no longer use delayed reveals: they rise with the track as one block (opacity 1 throughout; checked at p 0.3–1 at 1440). Spec §11.1 v2 (glass panels FLIP into the card positions) not done. |
+| P1-8 About portrait | ☑ | Chose grading over swapping photos: the black-background source is only 447 × 558 and waist-length, too small for the 4:5 slot. Image at brightness 0.92 under a radial vignette (clear centre on the face, 72% void at 78%, `#07090D` at the edges). Signal-blue border and scanline reveal unchanged. A dark-background About photo is still welcome (Open items). |
 | P1-7 Screenshot treatment | ☑ | Done with P0-4: images at saturate 0.85 / brightness 0.88, full colour + scale 1.03 on hover or keyboard focus (300 ms ease-lab, no scale with reduced motion), inner top shadow under the 34 px bar and a 1 px `rgba(255,255,255,0.06)` inner border. |
 
 ## Open items (content needed from Rahat)
