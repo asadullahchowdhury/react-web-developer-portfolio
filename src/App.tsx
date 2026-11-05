@@ -7,8 +7,8 @@ import About from './components/about/About';
 import Stack from './components/stack/Stack';
 import Work from './components/work/Work';
 import Experience from './components/experience/Experience';
-import Contact from './components/Contact';
-import Footer from './components/Footer';
+import Contact from './components/contact/Contact';
+import Footer from './components/footer/Footer';
 import { initSmoothScroll } from './lib/scroll';
 
 function App() {

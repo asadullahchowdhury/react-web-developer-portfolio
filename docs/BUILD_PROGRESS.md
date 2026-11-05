@@ -7,8 +7,8 @@
 | 2 Work | ☑ | fdb8eb7 | Pinned horizontal track, stacked mobile, native-scroll fallback |
 | 3 About | ☑ | d16afaa | Statement, portrait placeholder + scanline sweep, facts, principles |
 | 4 Stack | ☑ | 0010aa4 | Exploded isometric diagram, 160vh pin, mini diagram + cards on mobile |
-| 5 Experience | ☑ | (this commit) | Commit graph aligned to cards (1280–1920), top-down draw, mobile timeline |
-| 6 Contact + Footer | ☐ | | |
+| 5 Experience | ☑ | 3833f96 | Commit graph aligned to cards (1280–1920), top-down draw, mobile timeline |
+| 6 Contact + Footer | ☑ | (this commit) | Glass form + packet send, mocked send verified, footer wordmark |
 | 7 Integration & polish | ☐ | | |
 | 8 QA & report | ☐ | | |
 
@@ -61,6 +61,10 @@
 - Phase 5: graph nodes are positioned from each card's measured date line (ResizeObserver), so they align at any width — verified 0 px offset at 1280, 1440 and 1920.
 - Phase 5: the graph line draws top → bottom (newest first), scrubbed from the list's top at 60% of the viewport to its bottom at 60%; each node pops (0.6 → 1) and its card fades up when its date line reaches the same 60% line (reverses on scroll-up). The Codevioso lane below the merge is drawn faint, since the spec only describes it from the merge to HEAD.
 - Phase 5: mobile cards use the full descriptions — §20 asks for "short descriptions" but gives none.
+- Phase 6: EmailJS sending is unchanged (same service, template and public key, moved to `src/data/contact.ts`). The payload adds `project_type`; `subject` is kept for the existing template and filled as "New request: <type>".
+- Phase 6: no real email was sent during the build (that would message the owner). Success and error states were verified with a dev-only `?mockSend=ok|fail` switch (stripped from production). Real send is untested — see Open items.
+- Phase 6: copy not given by the spec — the success line reuses the old form's "Message sent successfully."; validation messages are "Please enter your name." / "Please enter a valid email address." / "Please add a short message.".
+- Phase 6: the send animation draws a line from the button to the platform ellipse, moves a glowing packet along it (~900 ms) and pulses the inner ellipse once; reduced motion skips it. Footer © row uses the current year (2026 now, per spec).
 - Verification note: the Claude browser pane often runs this tab at 0–2 frames per second, so time-based animations (entrances, scrubs) were checked by state (start state applied, trigger fires, end values after settling) rather than watched live.
 
 ## Open items (content needed from Rahat)
@@ -70,6 +74,8 @@
 - Redishketch years; provable highlights per role
 - Hero scene description for screen readers (currently `[PLACEHOLDER]`)
 - Résumé PDF: check it never mentions the client name (its text can't be scanned automatically)
+- Contact form: send one real test message after deploying (only mocked sends were tested), and check the EmailJS template shows `project_type`
+- Experience: provable highlights per role (none shown until supplied)
 
 ## Blocked / questions
 - 
