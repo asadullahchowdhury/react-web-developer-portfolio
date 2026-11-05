@@ -4,7 +4,7 @@ import 'aos/dist/aos.css';
 import Header from './components/Header';
 import Hero from './components/hero/Hero';
 import About from './components/about/About';
-import Skills from './components/Skills';
+import Stack from './components/stack/Stack';
 import Work from './components/work/Work';
 import Experience from './components/Experience';
 import Contact from './components/Contact';
@@ -34,7 +34,7 @@ function App() {
         <div className="relative z-10">
           <Work />
           <About />
-          <Skills />
+          <Stack />
           <Experience />
           <Contact />
         </div>
