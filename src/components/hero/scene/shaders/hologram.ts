@@ -7,7 +7,7 @@
  *
  *  - horizontal 1px scanlines every `uLinePitch` CSS px
  *  - rim: outline found by sampling the mask's alpha around each pixel
- *  - faint fill between the lines (brighter areas only) so the face reads
+ *  - fill between the lines (brighter areas only) so the face reads
  *  - vertical fade: 45% at the very top → 100% at 12% down
  *  - `uReveal` 0 → 1 scans the figure in from the top, with a bright front line
  *  - `uFlicker` multiplies the whole result (kept within 3% by the animation)
@@ -63,9 +63,10 @@ export const hologramFragment = /* glsl */ `
     float scanning = step(0.001, uReveal) * step(uReveal, 0.999);
     float scanLine = (1.0 - smoothstep(0.0, 0.012, abs(vUv.y - front))) * scanning * m.a;
 
-    // Faint continuous fill between the lines carries the facial detail
-    float fill = body * body * 0.32;
-    float alpha = (body * line * 0.9 + fill + edge) * fade * revealed * uOpacity * uFlicker;
+    // Continuous fill between the lines carries the facial detail; the lines
+    // themselves draw at full strength (owner asked for a brighter figure)
+    float fill = body * body * 0.55;
+    float alpha = (body * line + fill + edge) * fade * revealed * uOpacity * uFlicker;
     alpha += scanLine * 0.9;
 
     vec3 color = mix(uColor, uRim, clamp(edge + scanLine, 0.0, 1.0));

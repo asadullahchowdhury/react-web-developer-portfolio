@@ -1,4 +1,4 @@
-import{r as Se,j as $e,C as Gi,s as jt,B as aa,a as Gx,b as wg,W as oi,F as Ta,c as si,N as Bn,P as Nf,i as Wx,g as Xx,E as qx,h as Yx,L as ir,D as Eg}from"./index-Bo9bvbzQ.js";function Zx(r){return r&&r.__esModule&&Object.prototype.hasOwnProperty.call(r,"default")?r.default:r}/**
+import{r as Se,j as $e,C as Gi,s as jt,B as aa,a as Gx,b as wg,W as oi,F as Ta,c as si,N as Bn,P as Nf,i as Wx,g as Xx,E as qx,h as Yx,L as ir,D as Eg}from"./index-DOgOSGso.js";function Zx(r){return r&&r.__esModule&&Object.prototype.hasOwnProperty.call(r,"default")?r.default:r}/**
  * @license
  * Copyright 2010-2024 Three.js Authors
  * SPDX-License-Identifier: MIT
@@ -3995,9 +3995,10 @@ No matching component was found for:
     float scanning = step(0.001, uReveal) * step(uReveal, 0.999);
     float scanLine = (1.0 - smoothstep(0.0, 0.012, abs(vUv.y - front))) * scanning * m.a;
 
-    // Faint continuous fill between the lines carries the facial detail
-    float fill = body * body * 0.32;
-    float alpha = (body * line * 0.9 + fill + edge) * fade * revealed * uOpacity * uFlicker;
+    // Continuous fill between the lines carries the facial detail; the lines
+    // themselves draw at full strength (owner asked for a brighter figure)
+    float fill = body * body * 0.55;
+    float alpha = (body * line + fill + edge) * fade * revealed * uOpacity * uFlicker;
     alpha += scanLine * 0.9;
 
     vec3 color = mix(uColor, uRim, clamp(edge + scanLine, 0.0, 1.0));
