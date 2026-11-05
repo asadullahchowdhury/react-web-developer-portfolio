@@ -1,4 +1,4 @@
-import{r as Se,j as $e,C as Gi,s as jt,B as aa,a as Gx,b as wg,W as oi,F as Ta,c as si,N as Bn,P as Nf,i as Wx,g as Xx,E as qx,h as Yx,L as ir,D as Eg}from"./index-DOgOSGso.js";function Zx(r){return r&&r.__esModule&&Object.prototype.hasOwnProperty.call(r,"default")?r.default:r}/**
+import{r as Se,j as $e,C as Gi,s as jt,B as aa,a as Gx,b as wg,W as oi,F as Ta,c as si,N as Bn,P as Nf,i as Wx,g as Xx,E as qx,h as Yx,L as ir,D as Eg}from"./index-B1pYNjhW.js";function Zx(r){return r&&r.__esModule&&Object.prototype.hasOwnProperty.call(r,"default")?r.default:r}/**
  * @license
  * Copyright 2010-2024 Three.js Authors
  * SPDX-License-Identifier: MIT
@@ -3974,11 +3974,18 @@ No matching component was found for:
     float body = m.a * mix(0.22, 1.0, smoothstep(0.04, 0.62, luma));
 
     // Rim: alpha drop to any neighbour within uEdge
-    float n = min(
-      min(texture2D(uMask, vUv + vec2(uEdge, 0.0)).a, texture2D(uMask, vUv - vec2(uEdge, 0.0)).a),
-      min(texture2D(uMask, vUv + vec2(0.0, uEdge)).a, texture2D(uMask, vUv - vec2(0.0, uEdge)).a)
-    );
+    vec4 mr = texture2D(uMask, vUv + vec2(uEdge, 0.0));
+    vec4 ml = texture2D(uMask, vUv - vec2(uEdge, 0.0));
+    vec4 mu = texture2D(uMask, vUv + vec2(0.0, uEdge));
+    vec4 md = texture2D(uMask, vUv - vec2(0.0, uEdge));
+    float n = min(min(mr.a, ml.a), min(mu.a, md.a));
     float edge = clamp(m.a - n, 0.0, 1.0);
+
+    // Inner detail: luminance edges (sunglasses, beard, hairline, collar) drawn
+    // as thin bright strokes, so the face reads even when it is small
+    vec3 W = vec3(0.299, 0.587, 0.114);
+    vec2 grad = vec2(dot(mr.rgb, W) - dot(ml.rgb, W), dot(mu.rgb, W) - dot(md.rgb, W));
+    float detail = smoothstep(0.08, 0.32, length(grad)) * n;
 
     // Thin horizontal scanlines at a fixed screen pitch (crisp at any stage size)
     float pitch = uLinePitch * uPixelRatio;
@@ -3995,13 +4002,14 @@ No matching component was found for:
     float scanning = step(0.001, uReveal) * step(uReveal, 0.999);
     float scanLine = (1.0 - smoothstep(0.0, 0.012, abs(vUv.y - front))) * scanning * m.a;
 
-    // Continuous fill between the lines carries the facial detail; the lines
-    // themselves draw at full strength (owner asked for a brighter figure)
-    float fill = body * body * 0.55;
-    float alpha = (body * line + fill + edge) * fade * revealed * uOpacity * uFlicker;
+    // The portrait itself is drawn as a tinted image; scanlines modulate it
+    // (62% between lines, 100% on them) instead of being the only signal, so
+    // the face stays recognisable (owner request)
+    float image = body * mix(0.62, 1.0, line);
+    float alpha = (image + detail * 0.55 + edge) * fade * revealed * uOpacity * uFlicker;
     alpha += scanLine * 0.9;
 
-    vec3 color = mix(uColor, uRim, clamp(edge + scanLine, 0.0, 1.0));
+    vec3 color = mix(uColor, uRim, clamp(edge + detail * 0.6 + scanLine, 0.0, 1.0));
     gl_FragColor = vec4(color, alpha);
     #include <colorspace_fragment>
   }
