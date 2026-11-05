@@ -211,3 +211,13 @@ a:focus-visible .link-draw {
 @media (prefers-reduced-motion: reduce) {
   .link-draw { transition: none; }
 }
+
+/* ---- Polish P2-15: footer wordmark letters brighten near the pointer ----
+   --px / --py come from pointerFx.ts ([data-pointer-glow]); without them the
+   gradient sits off-screen and the letters are flat #10151D (spec §21). */
+.wordmark-letter {
+  color: transparent;
+  background: radial-gradient(280px circle at var(--px, -999px) var(--py, -999px), #253041, #10151d 75%) fixed;
+  -webkit-background-clip: text;
+  background-clip: text;
+}
