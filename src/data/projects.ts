@@ -58,3 +58,14 @@ export const PROJECTS: readonly Project[] = [
     link: null,
   },
 ];
+
+/**
+ * Projects with real data (title, description and image), in order. Only these
+ * are rendered; the counter and the Work pin length follow this list, so
+ * filling in project 03 above is all it takes to publish it.
+ */
+export const PUBLISHED_PROJECTS: readonly Project[] = PROJECTS.filter(
+  (p) =>
+    p.image !== null &&
+    [p.title, p.description, p.category, p.pathLabel].every((v) => v.trim() !== '' && !v.includes(PLACEHOLDER)),
+);

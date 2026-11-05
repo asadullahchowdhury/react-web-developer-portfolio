@@ -19,8 +19,11 @@ export const heroCopy = {
     prefix: 'Recently shipped —',
     projects: ['CAFM platform', 'Barberly'],
   },
-  /** Visually hidden description of the decorative 3D stage (spec §13). */
-  sceneDescription: '[PLACEHOLDER]',
+  /**
+   * Visually hidden description of the decorative 3D stage (spec §13).
+   * [PLACEHOLDER] until Rahat supplies the wording; not rendered while it is one.
+   */
+  sceneDescription: '[PLACEHOLDER]' as string,
 } as const;
 
 export const heroHud = {

@@ -4,8 +4,10 @@ import { loadScrollLibs, scrollToPosition, setPinActive } from '../../lib/scroll
 
 /** Scrub lag in seconds (spec §11.2). */
 const SCRUB = 0.4;
-/** Cards fade to this opacity once they have slid behind the left column. */
+/** Cards fade to this opacity as they slide out past the left column's edge. */
 const BEHIND_OPACITY = 0.4;
+/** Width of the soft edge where cards leave the track window (px). */
+const EDGE = 64;
 
 export interface WorkScrollRefs {
   section: RefObject<HTMLElement>;
@@ -14,13 +16,19 @@ export interface WorkScrollRefs {
   track: RefObject<HTMLElement>;
   counter: RefObject<HTMLElement>;
   fill: RefObject<HTMLElement>;
+  /** "Scroll →" hint; fades out once the last card is current. */
+  hint: RefObject<HTMLElement>;
+  /** Void-coloured gradient over the track window's left edge. */
+  edge: RefObject<HTMLElement>;
 }
 
 /**
  * Desktop Work journey (spec §11.2): pins `#projects` for (cards − 1) × 100vh
- * and maps vertical scroll to the track's translateX. Drives the `NN` counter
- * (a card becomes current when its centre passes the left third), the
- * progress fill and the fade of cards passing behind the left column.
+ * and maps vertical scroll to the track's translateX. The track window clips
+ * at the left column's right edge, so cards never pass under the heading.
+ * Drives the `NN` counter (the card with the most visible width in the
+ * window), the progress fill, the "Scroll" hint and the fade of cards as they
+ * leave through the left edge.
  * Focusing a card scrolls the page so the card is fully in view.
  *
  * `mode`:
@@ -35,6 +43,8 @@ export function useWorkScroll(refs: WorkScrollRefs, mode: 'pin' | 'native' | 'st
     const track = refs.track.current;
     const counter = refs.counter.current;
     const fill = refs.fill.current;
+    const hint = refs.hint.current;
+    const edge = refs.edge.current;
     if (!section || !viewport || !track || mode === 'stack') return;
 
     const cards = Array.from(track.querySelectorAll<HTMLElement>('[data-work-card]'));
@@ -42,23 +52,28 @@ export function useWorkScroll(refs: WorkScrollRefs, mode: 'pin' | 'native' | 'st
 
     /** Counter, fill and fades for a given track offset (px, ≤ 0) and progress. */
     const paint = (offset: number, progress: number, fade: boolean) => {
-      // A card becomes current when its centre passes this line: the track's
-      // left third at the start (spec §11.2), sliding to the right edge by the
-      // end, because the last card never reaches the left third.
+      // Current card = the one with the largest visible width in the window
       const width = viewport.clientWidth;
-      const line = width / 3 + progress * (width - width / 3);
       let current = 1;
+      let best = -1;
       cards.forEach((card, i) => {
         const left = card.offsetLeft + offset;
-        if (i > 0 && left + card.offsetWidth / 2 <= line) current = i + 1;
+        const right = left + card.offsetWidth;
+        const visible = Math.min(right, width) - Math.max(left, 0);
+        if (visible > best + 1) {
+          best = visible;
+          current = i + 1;
+        }
         if (fade) {
-          const right = left + card.offsetWidth;
-          const t = Math.min(Math.max(right / card.offsetWidth, 0), 1);
+          // Full opacity until the card reaches the edge, 40% once half of it is gone
+          const t = Math.min(Math.max(1 + left / (card.offsetWidth / 2), 0), 1);
           card.style.opacity = String(BEHIND_OPACITY + (1 - BEHIND_OPACITY) * t);
         }
       });
       if (counter) counter.textContent = String(current).padStart(2, '0');
       if (fill) fill.style.transform = `scaleX(${progress})`;
+      if (hint) hint.style.opacity = current === total ? '0' : '';
+      if (edge) edge.style.opacity = String(Math.min(Math.max(-offset / EDGE, 0), 1));
     };
 
     // Reduced motion / touch: native horizontal scroll, no pin
@@ -122,6 +137,8 @@ export function useWorkScroll(refs: WorkScrollRefs, mode: 'pin' | 'native' | 'st
         ctx.revert();
         setPinActive('work', false);
         cards.forEach((c) => (c.style.opacity = ''));
+        if (hint) hint.style.opacity = '';
+        if (edge) edge.style.opacity = '';
       };
       ScrollTrigger.refresh();
     });
@@ -130,5 +147,5 @@ export function useWorkScroll(refs: WorkScrollRefs, mode: 'pin' | 'native' | 'st
       cancelled = true;
       teardown();
     };
-  }, [refs.section, refs.viewport, refs.track, refs.counter, refs.fill, mode]);
+  }, [refs.section, refs.viewport, refs.track, refs.counter, refs.fill, refs.hint, refs.edge, mode]);
 }

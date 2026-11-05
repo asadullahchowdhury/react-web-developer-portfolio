@@ -78,6 +78,13 @@
 - Not done: responsive `srcset` for project/portrait images (Lighthouse estimates ~100 KB savings on mobile). Worth doing once the final screenshots arrive.
 - Verification note: the Claude browser pane often runs this tab at 0–2 frames per second, so time-based animations (entrances, scrubs) were checked by state (start state applied, trigger fires, end values after settling) rather than watched live.
 
+## Polish (docs/POLISH_PLAN.md)
+| Item | Status | Notes |
+|---|---|---|
+| P0-1 Work cards under heading | ☑ | Track window clips at the left column's edge (`overflow-x: clip`), 64 px void fade appears once the track moves; cards fade to 40% as half of them leaves. Checked at 5 pin positions (1440): card left edges never cross the column (column ends 424, window starts 488). |
+| P0-2 Work counter | ☑ | Current card = most visible width inside the window; "Scroll →" fades out at the last card. Same logic in the native-scroll mode. |
+| P0-3 No placeholders | ☑ | `PUBLISHED_PROJECTS` renders only projects with title, description, category, path label and image; counter shows `/ 02`, pin is 1 × 100vh. Also hid the hero's screen-reader scene description while it is `[PLACEHOLDER]`. No `[PLACEHOLDER]` text left in the DOM (390 and 1440). |
+
 ## Open items (content needed from Rahat)
 - Project 03 details + screenshot
 - CAFM anonymised screenshot (the current image shows the client logo and a customer name)

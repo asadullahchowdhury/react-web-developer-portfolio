@@ -1,6 +1,6 @@
 import { useRef } from 'react';
 import { ArrowRight, Github } from 'lucide-react';
-import { PROJECTS } from '../../data/projects';
+import { PUBLISHED_PROJECTS } from '../../data/projects';
 import { chapterLabel, SITE } from '../../data/site';
 import { useMediaQuery } from '../../hooks/useMediaQuery';
 import { useReveal } from '../../hooks/useReveal';
@@ -13,7 +13,7 @@ const LEAD = 'From database schema to deployed interface. Each one shipped and u
 const LEAD_MOBILE = 'From database schema to deployed interface.';
 
 const hud = `${chapterLabel('projects')} — Selected work`;
-const total = String(PROJECTS.length).padStart(2, '0');
+const total = String(PUBLISHED_PROJECTS.length).padStart(2, '0');
 
 /**
  * Selected Work (spec §3.5, §11.2, §12, §15).
@@ -28,12 +28,14 @@ const Work = () => {
   const track = useRef<HTMLDivElement>(null);
   const counter = useRef<HTMLSpanElement>(null);
   const fill = useRef<HTMLSpanElement>(null);
+  const hint = useRef<HTMLSpanElement>(null);
+  const edge = useRef<HTMLSpanElement>(null);
 
   const sceneMode = useSceneMode();
   const belowMd = useMediaQuery('(max-width: 767px)');
   const mode = belowMd ? 'stack' : sceneMode.mobile || sceneMode.reducedMotion ? 'native' : 'pin';
 
-  useWorkScroll({ section, viewport, track, counter, fill }, mode);
+  useWorkScroll({ section, viewport, track, counter, fill, hint, edge }, mode);
   useReveal(section);
 
   return (
@@ -72,7 +74,10 @@ const Work = () => {
               <span className="ml-2 text-[14px] tracking-normal text-ink-tertiary">/ {total}</span>
             </span>
             <span className="h-8 w-px bg-white/10" />
-            <span className="inline-flex items-center gap-1.5 font-mono text-[12px] text-ink-tertiary">
+            <span
+              ref={hint}
+              className="inline-flex items-center gap-1.5 font-mono text-[12px] text-ink-tertiary transition-opacity duration-300 ease-lab"
+            >
               Scroll <ArrowRight size={14} strokeWidth={1.75} />
             </span>
           </div>
@@ -81,18 +86,29 @@ const Work = () => {
         {/* Track window */}
         <div
           ref={viewport}
-          className={`min-w-0 ${
-            mode === 'native' ? 'overflow-x-auto overscroll-x-contain pb-4 [scrollbar-width:thin]' : ''
+          className={`relative min-w-0 ${
+            mode === 'native'
+              ? 'overflow-x-auto overscroll-x-contain pb-4 [scrollbar-width:thin]'
+              : mode === 'pin'
+                ? 'overflow-x-clip'
+                : ''
           }`}
           role={mode === 'native' ? 'region' : undefined}
           aria-label={mode === 'native' ? 'Projects' : undefined}
           tabIndex={mode === 'native' ? 0 : undefined}
         >
+          {mode === 'pin' && (
+            <span
+              ref={edge}
+              aria-hidden="true"
+              className="pointer-events-none absolute inset-y-0 left-0 z-10 w-16 bg-gradient-to-r from-void to-transparent opacity-0"
+            />
+          )}
           <div
             ref={track}
             className="flex flex-col gap-4 will-change-transform md:w-max md:flex-row md:items-start md:gap-6 md:pr-12 xl:pr-16"
           >
-            {PROJECTS.map((project, i) => (
+            {PUBLISHED_PROJECTS.map((project, i) => (
               <ProjectCard key={project.id} project={project} index={i} />
             ))}
           </div>

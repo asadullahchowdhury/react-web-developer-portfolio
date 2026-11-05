@@ -36,7 +36,7 @@ const ProjectCard = ({ project, index }: ProjectCardProps) => {
           <span className="truncate">{project.pathLabel}</span>
         </div>
         <div className="relative h-[220px] overflow-hidden md:h-[min(360px,38vh)]">
-          {project.image ? (
+          {project.image && (
             <img
               src={project.image}
               alt={project.imageAlt}
@@ -46,10 +46,6 @@ const ProjectCard = ({ project, index }: ProjectCardProps) => {
               height={1000}
               className="h-full w-full object-cover object-top transition-transform duration-[240ms] ease-lab motion-reduce:transition-none [@media(hover:hover)_and_(pointer:fine)]:group-hover:scale-[1.03] motion-reduce:group-hover:scale-100"
             />
-          ) : (
-            <div className="flex h-full items-center justify-center font-mono text-[12px] tracking-[0.08em] text-ink-tertiary">
-              [PLACEHOLDER]
-            </div>
           )}
         </div>
       </div>
