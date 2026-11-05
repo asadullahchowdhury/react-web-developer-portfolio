@@ -11,6 +11,12 @@ export const SITE = {
   resume: '/assets/resume.pdf',
   github: 'https://github.com/asadullahchowdhury',
   linkedin: 'https://www.linkedin.com/in/chowdhuryrahat',
+  /**
+   * WhatsApp chat link with a prefilled message. The phone number lives only
+   * in this URL: it must never be shown as visible text anywhere on the site.
+   */
+  whatsapp:
+    'https://wa.me/8801708746354?text=Hi%20Rahat%2C%20I%20saw%20your%20portfolio%20and%20would%20like%20to%20talk%20about%20a%20project.',
 } as const;
 
 export interface SocialLink {
@@ -23,6 +29,7 @@ export interface SocialLink {
 export const SOCIAL_LINKS: readonly SocialLink[] = [
   { label: 'GitHub', href: SITE.github, hint: 'github.com/asadullahchowdhury' },
   { label: 'LinkedIn', href: SITE.linkedin, hint: 'in/chowdhuryrahat' },
+  { label: 'WhatsApp', href: SITE.whatsapp, hint: 'Chat' },
   { label: 'Résumé', href: SITE.resume, hint: 'PDF' },
 ];
 
