@@ -78,7 +78,7 @@ const ContactForm = ({ onTransmit }: ContactFormProps) => {
     );
 
   return (
-    <div className="relative rounded-[20px] border border-white/[0.09] bg-glass p-5 shadow-[0_30px_80px_rgb(0_0_0/0.45)] backdrop-blur-[14px] md:p-8">
+    <div data-spotlight className="relative rounded-[20px] border border-white/[0.09] bg-glass p-5 shadow-[0_30px_80px_rgb(0_0_0/0.45)] backdrop-blur-[14px] md:p-8">
       <p
         role="status"
         aria-live="polite"
@@ -173,6 +173,7 @@ const ContactForm = ({ onTransmit }: ContactFormProps) => {
             <button
               ref={submit}
               type="submit"
+              data-magnetic
               disabled={status === 'sending'}
               className="inline-flex h-[52px] items-center justify-center gap-2 rounded-full bg-ink-primary px-6 text-button text-void transition-colors hover:bg-white disabled:cursor-progress disabled:opacity-80 md:h-12"
             >

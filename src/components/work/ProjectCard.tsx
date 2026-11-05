@@ -23,6 +23,7 @@ const ProjectCard = ({ project, index }: ProjectCardProps) => {
   return (
     <article
       data-work-card
+      data-spotlight
       aria-labelledby={titleId}
       tabIndex={project.link ? undefined : 0}
       className="group flex w-full shrink-0 flex-col gap-5 rounded-[18px] border border-white/[0.08] bg-surface-card p-3 pb-5 outline-none transition-[transform,border-color,background-color] duration-[240ms] ease-lab focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-signal has-[a:focus-visible]:outline-2 has-[a:focus-visible]:outline-offset-[3px] has-[a:focus-visible]:outline-signal motion-reduce:transition-none md:w-[600px] md:gap-6 md:rounded-[20px] md:p-4 md:pb-6 [@media(hover:hover)_and_(pointer:fine)]:hover:-translate-y-1 [@media(hover:hover)_and_(pointer:fine)]:hover:border-white/[0.16] [@media(hover:hover)_and_(pointer:fine)]:hover:bg-[#0E131B] motion-reduce:hover:translate-y-0"

@@ -8,6 +8,7 @@ import type { Role } from '../../data/experience';
 const RoleCard = ({ role }: { role: Role }) => (
   <article
     data-role-card
+    data-spotlight
     className={`flex flex-col gap-3 rounded-[14px] border bg-surface-card p-[18px] md:min-h-[220px] md:gap-4 md:rounded-[18px] md:px-8 md:py-7 ${
       role.current ? 'border-[rgb(242_178_122/0.3)]' : 'border-white/[0.08]'
     }`}

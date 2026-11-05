@@ -80,6 +80,7 @@ const About = () => {
               <li
                 key={p.number}
                 data-reveal="fade"
+                data-spotlight
                 className="flex flex-col gap-3 rounded-[18px] border border-white/[0.08] bg-surface-card p-5 md:gap-4 md:p-7"
               >
                 <span className="font-mono text-[12px] text-signal">{p.number}</span>
