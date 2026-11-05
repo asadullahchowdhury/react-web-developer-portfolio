@@ -109,7 +109,7 @@
 - Portrait: supplied and in use. For a sharper hologram, a larger head-and-shoulders cut-out (≥ 1600 px tall, spec §14) would help; the current one is 447 × 558 and waist-length.
 - Production domain, so `og:image` / `twitter:image` can be absolute URLs
 - Redishketch years; provable highlights per role
-- Hero scene description for screen readers (currently `[PLACEHOLDER]`)
+- Hero scene description for screen readers (`[PLACEHOLDER]` in `heroContent.ts`; not rendered until supplied)
 - Résumé PDF: check it never mentions the client name (its text can't be scanned automatically)
 - Contact form: send one real test message after deploying (only mocked sends were tested), and check the EmailJS template shows `project_type`
 - Experience: provable highlights per role (none shown until supplied)
@@ -124,5 +124,8 @@
   - Run 1 (before Phase 8 fixes): desktop 83 / 96 / 100 / 92 · mobile 77 / 96 / 100 / 92
   - Before the mobile first-touch change: desktop 94 / 100 / 100 / 100 · mobile 77 / 100 / 100 / 100
   - Final: desktop 98 / 100 / 100 / 100 (FCP 0.5 s, LCP 0.9 s, TBT 90 ms, CLS 0) · mobile 92 / 100 / 100 / 100 (FCP 1.8 s, LCP 3.2 s, TBT 50 ms, CLS 0)
+- Bundle sizes (gzip, after polish): main 106.8 KB · 3D chunk 224.9 KB · ScrollTrigger 17.7 KB · Lenis 5.6 KB · CSS 8.8 KB
+- Lighthouse after polish: desktop 96 / 100 / 100 / 100 (FCP 0.5 s, LCP 0.9 s, TBT 140 ms, CLS 0) · mobile 89 / 100 / 100 / 100 (FCP 2.0 s, LCP 3.5 s, TBT 110 ms, CLS 0). Mobile varies between runs (89–92); LCP is the hero poster.
+- Polish final checks: `tsc`, lint and build clean; no "equidesk" in `src/`, `public/`, `dist/`, `index.html`. Reduced motion (1440): no pins, no hidden content, magnetic off. Keyboard: focusing the second Work card's link brings it fully into the track window (the pane has no OS focus, so the focus event was dispatched directly). No horizontal overflow at 390 or 1440.
 
 STATUS: ALL PHASES COMPLETE
