@@ -24,7 +24,9 @@ export function useReveal(scope: RefObject<HTMLElement>) {
     let cancelled = false;
     let teardown = () => {};
 
-    loadScrollLibs().then(({ ScrollTrigger }) => {
+    // Set up only when the section is within half a viewport of the screen,
+    // so line-splitting and triggers for the whole page don't all run on load
+    const setup = () => loadScrollLibs().then(({ ScrollTrigger }) => {
       if (cancelled) return;
       const ctx = gsap.context(() => {
         root.querySelectorAll<HTMLElement>('[data-reveal="lines"]').forEach((el) => {
@@ -57,8 +59,19 @@ export function useReveal(scope: RefObject<HTMLElement>) {
       teardown = () => ctx.revert();
     });
 
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry.isIntersecting) return;
+        observer.disconnect();
+        setup();
+      },
+      { rootMargin: '50% 0px 50% 0px' },
+    );
+    observer.observe(root);
+
     return () => {
       cancelled = true;
+      observer.disconnect();
       teardown();
     };
   }, [scope, reduced]);

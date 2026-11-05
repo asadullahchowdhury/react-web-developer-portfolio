@@ -53,10 +53,13 @@ const Footer = () => {
       </div>
 
       <div aria-hidden="true" className="pointer-events-none select-none overflow-hidden px-5 md:px-12 xl:px-16">
-        <p className="-mb-[0.22em] whitespace-nowrap text-[76px] font-medium leading-none tracking-[-0.06em] text-[#10151D] md:text-[clamp(96px,11.7vw,168px)]">
-          <span className="md:hidden">Rahat</span>
-          <span className="hidden md:inline">{SITE.name}</span>
-        </p>
+        {/* Drawn as generated content: it is decorative and intentionally
+            low-contrast (#10151D, spec §21), so it stays out of the text tree */}
+        <p
+          data-mobile="Rahat"
+          data-desktop={SITE.name}
+          className="-mb-[0.22em] whitespace-nowrap text-[76px] font-medium leading-none tracking-[-0.06em] text-[#10151D] before:content-[attr(data-mobile)] md:text-[clamp(96px,11.7vw,168px)] md:before:content-[attr(data-desktop)]"
+        />
       </div>
     </footer>
   );

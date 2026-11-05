@@ -74,7 +74,7 @@ export const WORLD = {
     /** CSS px between scanlines (artboard 01: ~4px) */
     linePitch: 4,
     /** Transparent portrait (spec §8.1, §14); alpha × luminance drives the scanlines. */
-    maskUrl: '/assets/lab/portrait-hologram.png',
+    maskUrl: '/assets/lab/portrait-hologram.webp',
   },
   /** spec: rx 3.2, rz 1.6, y 0.9, signal 22%; tilted so the front sits lower */
   orbit: { rx: 2.17, rz: 1.25, y: 0.55, tilt: 0.92, opacity: 0.22, segments: 192 },

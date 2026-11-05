@@ -29,7 +29,7 @@ export const PROJECTS: readonly Project[] = [
     description:
       'Computer-aided facilities management: assets, work orders and maintenance in one system.',
     pathLabel: 'cafm / dashboard',
-    image: '/assets/images/cafm-platform.png',
+    image: '/assets/images/cafm-platform.webp',
     imageAlt: 'CAFM Platform dashboard',
     tags: ['Laravel', 'Vue.js', 'Angular', 'Full-stack'],
     // [PLACEHOLDER] case study or none — no public client URL (spec §15)
@@ -41,7 +41,7 @@ export const PROJECTS: readonly Project[] = [
     category: 'SaaS · Booking & management',
     description: 'Cloud software that helps barbershops and salons run bookings, staff and payments.',
     pathLabel: 'barberly / bookings',
-    image: '/assets/images/barberly.png',
+    image: '/assets/images/barberly.webp',
     imageAlt: 'Barberly booking dashboard',
     tags: ['Vue.js', 'Node.js', 'Laravel', 'Stripe'],
     link: { href: 'https://barberly.thethemeai.com', label: 'Open Barberly' },

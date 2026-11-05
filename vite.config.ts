@@ -100,6 +100,9 @@ function saveAppIcons(): Plugin {
  */
 const IMAGE_TARGETS: Record<string, string> = {
   'portrait-about.webp': fileURLToPath(new URL('./public/assets/images/', import.meta.url)),
+  'barberly.webp': fileURLToPath(new URL('./public/assets/images/', import.meta.url)),
+  'cafm-platform.webp': fileURLToPath(new URL('./public/assets/images/', import.meta.url)),
+  'portrait-hologram.webp': fileURLToPath(new URL('./public/assets/lab/', import.meta.url)),
   'og-image.png': fileURLToPath(new URL('./public/', import.meta.url)),
 };
 

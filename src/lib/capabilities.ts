@@ -25,9 +25,15 @@ export const hasFinePointer = () => media('(pointer: fine) and (hover: hover)');
 
 let webglSupport: boolean | undefined;
 
+/** Renderers that emulate the GPU on the CPU: the scene would stall the main thread. */
+const SOFTWARE_RENDERER = /swiftshader|llvmpipe|softpipe|software|basic render/i;
+
 /**
- * True when a WebGL context can be created. Probes once, then releases the
- * test context so it does not count against the browser's context limit.
+ * True when a hardware-accelerated WebGL context can be created. Software
+ * renderers (no GPU, or GPU blocklisted) count as unsupported: compiling and
+ * drawing the scene there takes ~1 s of main-thread time, so the static poster
+ * is the better experience. Probes once, then releases the test context so it
+ * does not count against the browser's context limit.
  * Dev builds accept `?webgl=0` to force the no-WebGL fallback.
  */
 export function supportsWebGL(): boolean {
@@ -39,7 +45,13 @@ export function supportsWebGL(): boolean {
     const gl =
       (canvas.getContext('webgl2') as WebGL2RenderingContext | null) ??
       (canvas.getContext('webgl') as WebGLRenderingContext | null);
-    webglSupport = !!gl;
+    let hardware = !!gl;
+    if (gl) {
+      const info = gl.getExtension('WEBGL_debug_renderer_info');
+      const renderer = String(gl.getParameter(info ? info.UNMASKED_RENDERER_WEBGL : gl.RENDERER));
+      if (SOFTWARE_RENDERER.test(renderer)) hardware = false;
+    }
+    webglSupport = hardware;
     gl?.getExtension('WEBGL_lose_context')?.loseContext();
   } catch {
     webglSupport = false;
