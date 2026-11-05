@@ -157,20 +157,40 @@ const endNavigating = () => {
   navigatingTimer = window.setTimeout(() => (navigating = false), 150);
 };
 
+interface ScrollToOptions {
+  immediate?: boolean;
+  /** Seconds (default 1.4 with Lenis, 1.2 without). */
+  duration?: number;
+  /** A GSAP ease name, e.g. 'lab' (the shared ease-lab curve). */
+  ease?: string;
+  /** Called once the scroll has arrived. */
+  onComplete?: () => void;
+}
+
 /** Scroll to a document position, through Lenis when it is running. */
-export function scrollToPosition(top: number, { immediate = false } = {}) {
+export function scrollToPosition(top: number, { immediate = false, duration, ease, onComplete }: ScrollToOptions = {}) {
   const instant = immediate || prefersReducedMotion();
   navigating = true;
   window.clearTimeout(navigatingTimer);
+  const done = () => {
+    endNavigating();
+    onComplete?.();
+  };
   if (lenis) {
-    lenis.scrollTo(top, { duration: 1.4, immediate: instant, force: true, onComplete: endNavigating });
-    if (instant) endNavigating();
+    lenis.scrollTo(top, {
+      duration: duration ?? 1.4,
+      easing: ease ? gsap.parseEase(ease) : undefined,
+      immediate: instant,
+      force: true,
+      onComplete: done,
+    });
+    if (instant) done();
   } else {
     gsap.to(window, {
-      duration: instant ? 0 : 1.2,
+      duration: instant ? 0 : (duration ?? 1.2),
       scrollTo: top,
-      ease: 'power2.inOut',
-      onComplete: endNavigating,
+      ease: ease ?? 'power2.inOut',
+      onComplete: done,
     });
   }
 }

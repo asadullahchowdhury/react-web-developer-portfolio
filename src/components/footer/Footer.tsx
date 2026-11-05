@@ -3,6 +3,7 @@ import { SITE } from '../../data/site';
 import { useReducedMotion } from '../../hooks/useReducedMotion';
 import { EASE_LAB, gsap } from '../../lib/motion';
 import { loadScrollLibs, scrollToId, scrollToPosition } from '../../lib/scroll';
+import { replaySceneIntro } from '../hero/scene/replayIntro';
 
 const FOOTER_NAV = [
   { label: 'Work', target: 'projects' },
@@ -71,7 +72,8 @@ const Footer = () => {
   };
   const toTop = (e: MouseEvent<HTMLAnchorElement>) => {
     e.preventDefault();
-    scrollToPosition(0);
+    // Lenis, 1.2 s on the shared ease-lab curve, then a short intro replay
+    scrollToPosition(0, { duration: 1.2, ease: 'lab', onComplete: replaySceneIntro });
   };
 
   return (
