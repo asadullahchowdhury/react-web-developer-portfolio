@@ -53,17 +53,47 @@ function afterLoadAndIdle(callback: () => void): () => void {
   };
 }
 
-/** Lazy 3D canvas lifecycle (spec §13): load after first paint, fall back to the poster. */
+const INTERACTION_EVENTS = ['pointerdown', 'touchstart', 'wheel', 'scroll', 'keydown'] as const;
+
+/**
+ * Waits for the user's first touch, scroll, wheel or key press, then for load
+ * and idle. Used on mobile so the scene's startup work (about 1 s of
+ * main-thread time on mid-range phones) never competes with the first load;
+ * the poster is shown until then.
+ */
+function afterFirstInteraction(callback: () => void): () => void {
+  let cancelIdle: (() => void) | undefined;
+  const opts = { passive: true, capture: true } as const;
+
+  const remove = () => INTERACTION_EVENTS.forEach((e) => window.removeEventListener(e, start, opts));
+  function start() {
+    remove();
+    cancelIdle = afterLoadAndIdle(callback);
+  }
+  INTERACTION_EVENTS.forEach((e) => window.addEventListener(e, start, opts));
+
+  return () => {
+    remove();
+    cancelIdle?.();
+  };
+}
+
+/**
+ * Lazy 3D canvas lifecycle (spec §13): load after first paint, fall back to
+ * the poster. On mobile the scene waits for the first interaction.
+ */
 export function useLabCanvas(mode: SceneMode): LabCanvasControl {
   const [state, setState] = useState<CanvasState>('poster');
+  const { mobile } = mode;
 
   useEffect(() => {
     if (!supportsWebGL()) {
       setState('failed');
       return;
     }
-    return afterLoadAndIdle(() => setState('loading'));
-  }, []);
+    const begin = () => setState((s) => (s === 'poster' ? 'loading' : s));
+    return mobile ? afterFirstInteraction(begin) : afterLoadAndIdle(begin);
+  }, [mobile]);
 
   const onReady = useCallback(() => setState('ready'), []);
   const onFailure = useCallback(() => setState('failed'), []);

@@ -72,7 +72,7 @@
 - Phase 7: pin sequence verified with no overlap — hero 822→1588, Work 1588→2284 (starts exactly at the hero pin end), Stack 4081→4638 (starts at its section top). Chapter counters: 01 hero, 02 Work, 03 About/Stack/Experience, 04 Contact.
 - Phase 8: Lighthouse run 1 found a footer-wordmark contrast failure, no `robots.txt`, a ~500 ms startup long task and heavy images. Fixes: the decorative wordmark is drawn as CSS generated content (out of the text tree, still `aria-hidden`); `public/robots.txt` added; section reveals (SplitText + ScrollTrigger) are now set up only when a section comes within half a viewport, instead of all on load; project screenshots and the hologram mask converted from PNG to WebP (barberly 41 KB, cafm-platform 46 KB, portrait-hologram 22 KB).
 - Phase 8: WebGL on software renderers (SwiftShader, llvmpipe, "Microsoft Basic Render") is now treated as unsupported, so machines without a usable GPU keep the static poster instead of stalling for ~1 s. GPU devices are unaffected (checked: the scene still loads on Intel UHD / D3D11).
-- Phase 8: mobile Performance stays below the §13 target (75–77 vs 80). The remaining cost is the 3D scene's startup (~1 s main-thread task under Lighthouse's 4× CPU throttle) after the page has loaded; the same page with WebGL disabled scores 89 (TBT 70 ms). The scene already loads only after `load` + idle. Cutting further means changing the spec (e.g. poster-only on mobile, or starting the scene on first interaction), so it is left as an owner decision (Blocked / questions).
+- Phase 8: mobile Performance was 75–77 (target 80) because of the 3D scene's startup (~1 s main-thread task under Lighthouse's 4× CPU throttle). Owner decision: on mobile the scene now starts on the first touch, scroll, wheel or key press (then waits for load + idle); the poster is shown until then. Desktop is unchanged (load + idle). Verified both paths in the browser.
 - Phase 8: fallback pass — `?webgl=0&motion=reduce`: no canvas, no pins, poster shown, all content visible, no console errors, no horizontal overflow. No "Equidesk" anywhere in `src/`, `public/`, `dist/` or `index.html`. `.lighthouse/` and `*.tsbuildinfo` added to `.gitignore`.
 - Phase 8: environment — the C: drive is full (0 bytes free), so `npx lighthouse` was run with its npm cache, temp folder and Chrome profile on D:. Nothing on C: was touched.
 - Not done: responsive `srcset` for project/portrait images (Lighthouse estimates ~100 KB savings on mobile). Worth doing once the final screenshots arrive.
@@ -90,7 +90,6 @@
 - Experience: provable highlights per role (none shown until supplied)
 
 ## Blocked / questions
-- Mobile Lighthouse Performance 77 (target ≥ 80): caused by the 3D scene starting after load. Options: keep as is, show the poster only on mobile, or start the scene on first touch/scroll. Needs your call.
 - The C: drive is full; free some space there (npm, Chrome and temp files default to it).
 
 ## Metrics
@@ -98,7 +97,7 @@
 - Bundle sizes (gzip, Phase 8): main 104.8 KB · 3D chunk 224.9 KB · ScrollTrigger 17.7 KB · Lenis 5.6 KB · CSS 7.6 KB
 - Lighthouse (production preview, Lighthouse 12), Performance / Accessibility / Best practices / SEO:
   - Run 1 (before Phase 8 fixes): desktop 83 / 96 / 100 / 92 · mobile 77 / 96 / 100 / 92
-  - Final: desktop 94 / 100 / 100 / 100 (FCP 0.5 s, LCP 0.9 s, TBT 180 ms, CLS 0) · mobile 77 / 100 / 100 / 100 (FCP 1.7 s, LCP 3.1 s, TBT 650 ms, CLS 0)
-  - Mobile with WebGL disabled, for comparison: Performance 89 (TBT 70 ms)
+  - Before the mobile first-touch change: desktop 94 / 100 / 100 / 100 · mobile 77 / 100 / 100 / 100
+  - Final: desktop 98 / 100 / 100 / 100 (FCP 0.5 s, LCP 0.9 s, TBT 90 ms, CLS 0) · mobile 92 / 100 / 100 / 100 (FCP 1.8 s, LCP 3.2 s, TBT 50 ms, CLS 0)
 
 STATUS: ALL PHASES COMPLETE
