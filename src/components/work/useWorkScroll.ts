@@ -1,5 +1,6 @@
 import { type RefObject, useEffect } from 'react';
-import { gsap } from '../../lib/motion';
+import { prefersReducedMotion } from '../../lib/capabilities';
+import { EASE_LAB, gsap } from '../../lib/motion';
 import { loadScrollLibs, scrollToPosition, setPinActive } from '../../lib/scroll';
 
 /** Scrub lag in seconds (spec §11.2). */
@@ -48,7 +49,33 @@ export function useWorkScroll(
     const fill = refs.fill.current;
     const hint = refs.hint.current;
     const edge = refs.edge.current;
-    if (!section || !viewport || !track || mode === 'stack') return;
+    if (!section || !viewport || !track) return;
+
+    // Below 768 px: cards scale in from 0.96 as they enter (POLISH P2-16)
+    if (mode === 'stack') {
+      if (prefersReducedMotion()) return;
+      let cancelled = false;
+      let revert = () => {};
+      loadScrollLibs().then(() => {
+        if (cancelled) return;
+        const ctx = gsap.context(() => {
+          track.querySelectorAll<HTMLElement>('[data-work-card]').forEach((card) => {
+            gsap.from(card, {
+              scale: 0.96,
+              opacity: 0,
+              duration: 0.6,
+              ease: EASE_LAB,
+              scrollTrigger: { trigger: card, start: 'top 90%', once: true },
+            });
+          });
+        }, track);
+        revert = () => ctx.revert();
+      });
+      return () => {
+        cancelled = true;
+        revert();
+      };
+    }
 
     const cards = Array.from(track.querySelectorAll<HTMLElement>('[data-work-card]'));
     let lastCurrent = 0;
