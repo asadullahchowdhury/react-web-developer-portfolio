@@ -102,6 +102,7 @@ const IMAGE_TARGETS: Record<string, string> = {
   'portrait-about.webp': fileURLToPath(new URL('./public/assets/images/', import.meta.url)),
   'barberly.webp': fileURLToPath(new URL('./public/assets/images/', import.meta.url)),
   'cafm-platform.webp': fileURLToPath(new URL('./public/assets/images/', import.meta.url)),
+  'hotel-blue-castle.webp': fileURLToPath(new URL('./public/assets/images/', import.meta.url)),
   'portrait-hologram.webp': fileURLToPath(new URL('./public/assets/lab/', import.meta.url)),
   'og-image.png': fileURLToPath(new URL('./public/', import.meta.url)),
 };
@@ -136,5 +137,10 @@ export default defineConfig({
   plugins: [react(), preloadFonts(), saveScenePoster(), saveAppIcons(), saveSiteImages()],
   optimizeDeps: {
     exclude: ['lucide-react'],
+  },
+  server: {
+    // Lighthouse / headless Chrome runs keep locked profile files here,
+    // which crash the dev server's file watcher
+    watch: { ignored: ['**/.lighthouse/**'] },
   },
 });

@@ -47,14 +47,16 @@ export const PROJECTS: readonly Project[] = [
     link: { href: 'https://barberly.thethemeai.com', label: 'Open Barberly' },
   },
   {
-    id: 'project-03',
-    title: PLACEHOLDER,
-    category: PLACEHOLDER,
-    description: PLACEHOLDER,
-    pathLabel: PLACEHOLDER,
-    image: null,
-    imageAlt: '',
-    tags: [],
+    id: 'hotel-blue-castle',
+    title: 'Hotel Blue Castle',
+    category: 'Hotel PMS · Website & operations',
+    description:
+      'Property management system for a single hotel: reservations, front desk, billing, housekeeping and the public booking site, in one app.',
+    pathLabel: 'blue-castle / home',
+    image: '/assets/images/hotel-blue-castle.webp',
+    imageAlt: 'Hotel Blue Castle website home page',
+    tags: ['Laravel', 'Vue.js', 'MySQL', 'Full-stack'],
+    // Private repository and no public deployment yet
     link: null,
   },
 ];
