@@ -1,0 +1,53 @@
+# Build progress
+
+| Phase | Status | Commit | Notes |
+|---|---|---|---|
+| 0 Preflight | ☑ | (this commit) | Inventory below; build passes |
+| 1 Foundation | ☐ | | |
+| 2 Work | ☐ | | |
+| 3 About | ☐ | | |
+| 4 Stack | ☐ | | |
+| 5 Experience | ☐ | | |
+| 6 Contact + Footer | ☐ | | |
+| 7 Integration & polish | ☐ | | |
+| 8 QA & report | ☐ | | |
+
+## Inventory (Phase 0)
+
+**Built and matching the spec**
+- Hero (§2–13): layout, 3D lab scene, intro, parallax, 220vh pin with camera dolly and v1 hand-off, posters, no-WebGL and reduced-motion fallbacks.
+- Header + mobile menu, RC logo, favicon set, web manifest.
+- Graphite Lab tokens (§5) and Geist / Geist Mono (§4) are global; `ease-lab` exists as a CSS variable, Tailwind `ease-lab` class and GSAP `CustomEase`.
+- Lenis + ScrollTrigger as a single instance (`src/lib/scroll.ts`), lazy-loaded after first paint; `ScrollTrigger.refresh()` after fonts / load.
+- Section order in `App.tsx` already Hero → Projects → About → Skills → Experience → Contact → Footer.
+- Removed earlier: Preloader, AnimatedBackground, TypewriterCode, CursorDot.
+
+**Gaps (old UI still in place)**
+- `Projects.tsx`: old 2-column grid with three "concept" projects using remote Pexels images; no horizontal pin (§3.5, §11.2).
+- `About.tsx`, `Skills.tsx` (percentage bars), `Experience.tsx` (unverified metrics, "Senior Full-Stack Developer, CodeVioso"), `Contact.tsx`, `Footer.tsx`: old indigo-era UI.
+- AOS still used by all of the above and initialised in `App.tsx`.
+- `index.html`: old title "Rahat Chowdhury | Web Developer Portfolio", no meta description, no OG image.
+- Unused assets: `public/assets/images/project-placeholder.svg`, `meta-logo-rahat.webp`, `me 1.jpg` (6.8 MB, unused).
+- No `useReducedMotion` hook, entrance helper, `SectionHeader` or `src/data/*` files yet.
+
+## Decisions
+- Phase 0: the owner's uncommitted docs edits (`BUILD_PLAN.md` branch wording, new `CLOUD_BUILD.md`) were committed as `wip: before redesign phases` (cde6a46) after the build passed.
+- `dist/` is tracked in this repo, so each phase commit includes a fresh `npm run build` (as `CLOUD_BUILD.md` asks).
+- No artboard images exist in `docs/`; visual checks compare against the spec's measurements.
+- Playwright and Lighthouse are not installed. Visual checks use the Claude browser pane (screenshots are inspected but cannot be saved to `docs/screens/`); Lighthouse is run with `npx lighthouse` in Phase 8.
+- `public/assets/images/cafm-platform.png` is the original CAFM dashboard screenshot, kept on the owner's explicit instruction until an anonymised one is supplied. It still shows the client logo and a customer name (see Open items).
+
+## Open items (content needed from Rahat)
+- Project 03 details + screenshot
+- CAFM anonymised screenshot (the current image shows the client logo and a customer name)
+- Portrait (hologram + About)
+- Redishketch years; provable highlights per role
+- Hero scene description for screen readers (currently `[PLACEHOLDER]`)
+- Résumé PDF: check it never mentions the client name (its text can't be scanned automatically)
+
+## Blocked / questions
+- 
+
+## Metrics
+- Bundle sizes (gzip, Phase 0): main 105.3 KB · 3D chunk 230.2 KB · ScrollTrigger 18.1 KB · Lenis 5.7 KB · CSS 9.6 KB
+- Lighthouse desktop / mobile:
