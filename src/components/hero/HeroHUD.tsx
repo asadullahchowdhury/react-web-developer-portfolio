@@ -9,15 +9,8 @@ const HeroHUD = () => (
 
     {/* Tablet and up */}
     <p className="hidden md:block">
-      {/* Counter swaps 01 → 02 at the hand-off; the rest of the HUD fades on scroll */}
-      <span className="inline-grid">
-        <span data-hud-chapter="current" className="[grid-area:1/1]">
-          {heroHud.desktop.chapter}
-        </span>
-        <span data-hud-chapter="next" aria-hidden="true" className="opacity-0 [grid-area:1/1]">
-          {heroHud.desktop.chapterNext}
-        </span>
-      </span>
+      {/* The whole HUD fades on scroll, the counter last; Work brings its own 02 / 04 */}
+      <span data-hud-chapter>{heroHud.desktop.chapter}</span>
       <span data-hud-fade>
         <span aria-hidden="true"> — </span>
         {heroHud.desktop.status}

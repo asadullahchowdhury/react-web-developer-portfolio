@@ -1,6 +1,6 @@
 import { type RefObject, useEffect } from 'react';
 import { gsap } from '../../lib/motion';
-import { loadScrollLibs, registerScrollTarget, scrollToPosition, setHeroPinned } from '../../lib/scroll';
+import { loadScrollLibs, registerScrollTarget, scrollToPosition, setPinActive } from '../../lib/scroll';
 import { sceneState } from './scene/sceneState';
 import type { SceneMode } from './useSceneMode';
 
@@ -17,7 +17,9 @@ const SCRUB = 0.6;
  *                light-ups run in the scene from sceneState.scrollProgress)
  *   0.35 → 0.80  glass panels scale to 1.15, drift toward the centre and fade;
  *                hologram dims (in the scene)
- *   0.80 → 1.00  scene layer fades to 15%; HUD counter becomes 02 / 04
+ *   0.35 → 0.45  HUD chapter counter fades, so it is gone before Work (and
+ *                its own 02 / 04 HUD line) starts rising at p ≈ 0.55
+ *   0.80 → 1.00  scene layer fades to 15%
  *
  * Hand-off: the pin uses no spacing; a measured runway after the hero makes
  * the Work section (#projects, positioned above the hero) slide over the
@@ -94,7 +96,7 @@ export function useHeroScroll(
             scrub: SCRUB,
             invalidateOnRefresh: true,
             // The header reads this: it never hides during the pin
-            onToggle: (self) => setHeroPinned(self.isActive),
+            onToggle: (self) => setPinActive('hero', self.isActive),
           },
           onUpdate: () => {
             sceneState.scrollProgress = tl.progress();
@@ -105,8 +107,7 @@ export function useHeroScroll(
           .to(q('[data-hud-fade]'), { opacity: 0, duration: 0.35 }, 0)
           .to(q('[data-panel="deploy"]'), { scale: 1.15, xPercent: -60, yPercent: 40, opacity: 0, duration: 0.45 }, 0.35)
           .to(q('[data-panel="schema"]'), { scale: 1.15, xPercent: 60, yPercent: -40, opacity: 0, duration: 0.45 }, 0.35)
-          .to(q('[data-hud-chapter="current"]'), { opacity: 0, duration: 0.04 }, 0.8)
-          .to(q('[data-hud-chapter="next"]'), { opacity: 1, duration: 0.04 }, 0.8);
+          .to(q('[data-hud-chapter]'), { opacity: 0, duration: 0.1 }, 0.35);
         if (sceneLayers.length) tl.to(sceneLayers, { opacity: 0.15, duration: 0.2 }, 0.8);
         tl.set({}, {}, 1); // timeline spans exactly p 0 → 1
 
@@ -130,7 +131,7 @@ export function useHeroScroll(
         ctx.revert();
         runway.style.height = '0px';
         sceneState.scrollProgress = 0;
-        setHeroPinned(false);
+        setPinActive('hero', false);
       };
       ScrollTrigger.refresh();
     });

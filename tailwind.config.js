@@ -25,18 +25,6 @@ export default {
           tertiary: channel('text-tertiary'),
         },
 
-        /* Legacy names still used by existing sections */
-        background: {
-          primary: channel('bg-primary'),
-          secondary: channel('bg-secondary'),
-        },
-        foreground: {
-          primary: channel('text-primary'),
-          secondary: channel('text-secondary'),
-          body: channel('text-body'),
-          tertiary: channel('text-tertiary'),
-        },
-        accent: channel('accent'),
       },
       borderColor: {
         subtle: 'var(--border-subtle)',
@@ -44,15 +32,6 @@ export default {
       },
       backgroundColor: {
         glass: 'var(--glass-fill)',
-      },
-      ringColor: {
-        accent: 'var(--accent)',
-      },
-      ringOffsetColor: {
-        'background-primary': 'var(--bg-primary)',
-      },
-      boxShadow: {
-        soft: 'var(--shadow-soft)',
       },
       fontFamily: {
         sans: ['"Geist Sans"', ...defaultTheme.fontFamily.sans],

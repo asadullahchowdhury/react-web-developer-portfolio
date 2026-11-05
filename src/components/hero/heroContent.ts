@@ -19,15 +19,16 @@ export const heroCopy = {
     prefix: 'Recently shipped —',
     projects: ['CAFM platform', 'Barberly'],
   },
-  /** Visually hidden description of the decorative 3D stage (spec §13). */
-  sceneDescription: '[PLACEHOLDER]',
+  /**
+   * Visually hidden description of the decorative 3D stage (spec §13).
+   * [PLACEHOLDER] until Rahat supplies the wording; not rendered while it is one.
+   */
+  sceneDescription: '[PLACEHOLDER]' as string,
 } as const;
 
 export const heroHud = {
   desktop: {
     chapter: '01 / 04',
-    /** Shown once the hero hands off to Work (spec §11.1). */
-    chapterNext: '02 / 04',
     status: 'Jashore, BD · Open to product work & freelance',
   },
   mobile: {

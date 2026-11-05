@@ -25,14 +25,18 @@ const HeroCopy = () => {
       </p>
 
       <div className="flex flex-col gap-2.5 md:flex-row md:gap-3">
-        <a
-          href={`#${primaryCta.target}`}
-          onClick={onEnterLab}
-          data-intro="cta"
-          className="inline-flex h-[52px] items-center justify-center rounded-full bg-ink-primary px-6 text-button text-void transition-colors duration-200 hover:bg-white md:h-[50px]"
-        >
-          {primaryCta.label}
-        </a>
+        {/* The intro animates the wrapper, so the magnetic `translate` on the
+            link isn't reset by GSAP */}
+        <div data-intro="cta" className="flex flex-col">
+          <a
+            href={`#${primaryCta.target}`}
+            onClick={onEnterLab}
+            data-magnetic
+            className="inline-flex h-[52px] items-center justify-center rounded-full bg-ink-primary px-6 text-button text-void transition-colors duration-200 hover:bg-white md:h-[50px]"
+          >
+            {primaryCta.label}
+          </a>
+        </div>
         <a
           href={secondaryCta.href}
           target="_blank"

@@ -50,6 +50,16 @@ export function registerScrollTarget(id: string, resolve: () => number): () => v
   };
 }
 
+const SCROLL_KEY = `scroll:${window.location.pathname}`;
+
+/** Saved position to restore — only on reload or back/forward, never on a fresh visit. */
+function takeSavedScroll(): number | null {
+  const nav = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming | undefined;
+  const saved = sessionStorage.getItem(SCROLL_KEY);
+  if (!saved || !nav || (nav.type !== 'reload' && nav.type !== 'back_forward')) return null;
+  return Number(saved) || 0;
+}
+
 /**
  * Smooth scrolling with Lenis, driven by GSAP's ticker and kept in sync with
  * ScrollTrigger (spec §11). Off with reduced motion. Also refreshes
@@ -58,7 +68,7 @@ export function registerScrollTarget(id: string, resolve: () => number): () => v
  *
  * Returns a cleanup function.
  */
-export function initSmoothScroll(onRefresh?: () => void): () => void {
+export function initSmoothScroll(): () => void {
   let cancelled = false;
   const cleanups: (() => void)[] = [];
 
@@ -79,19 +89,29 @@ export function initSmoothScroll(onRefresh?: () => void): () => void {
       });
     }
 
-    if (onRefresh) {
-      ScrollTrigger.addEventListener('refresh', onRefresh);
-      cleanups.push(() => ScrollTrigger.removeEventListener('refresh', onRefresh));
-    }
-
-    const refresh = () => ScrollTrigger.refresh();
-    document.fonts?.ready.then(() => !cancelled && refresh());
-    if (document.readyState === 'complete') refresh();
-    else {
-      window.addEventListener('load', refresh, { once: true });
-      cleanups.push(() => window.removeEventListener('load', refresh));
-    }
+    // Refresh once fonts and images are in, then put the reader back where
+    // they were on reload / back-forward (pins change the page height, so the
+    // browser's own restoration lands too high)
+    const loaded = new Promise<void>((resolve) => {
+      if (document.readyState === 'complete') resolve();
+      else window.addEventListener('load', () => resolve(), { once: true });
+    });
+    Promise.all([document.fonts?.ready ?? Promise.resolve(), loaded]).then(() => {
+      if (cancelled) return;
+      ScrollTrigger.refresh();
+      const saved = takeSavedScroll();
+      if (saved !== null) {
+        scrollToPosition(saved, { immediate: true });
+        ScrollTrigger.update();
+      }
+    });
   });
+
+  // Manual scroll restoration: remember the position when leaving the page
+  if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+  const save = () => sessionStorage.setItem(SCROLL_KEY, String(Math.round(window.scrollY)));
+  window.addEventListener('pagehide', save);
+  cleanups.push(() => window.removeEventListener('pagehide', save));
 
   return () => {
     cancelled = true;
@@ -99,12 +119,16 @@ export function initSmoothScroll(onRefresh?: () => void): () => void {
   };
 }
 
-/** True while the hero is pinned (set by useHeroScroll); the header never hides then. */
-let heroPinned = false;
-export const setHeroPinned = (pinned: boolean) => {
-  heroPinned = pinned;
+/**
+ * Pinned sections currently holding the viewport (hero, work, stack…).
+ * The header never hides while any pin is active.
+ */
+const activePins = new Set<string>();
+export const setPinActive = (key: string, active: boolean) => {
+  if (active) activePins.add(key);
+  else activePins.delete(key);
 };
-export const isHeroPinned = () => heroPinned;
+export const isPinActive = () => activePins.size > 0;
 
 /**
  * Locks page scrolling (e.g. full-screen menu): pauses Lenis and stops native
@@ -133,20 +157,40 @@ const endNavigating = () => {
   navigatingTimer = window.setTimeout(() => (navigating = false), 150);
 };
 
+interface ScrollToOptions {
+  immediate?: boolean;
+  /** Seconds (default 1.4 with Lenis, 1.2 without). */
+  duration?: number;
+  /** A GSAP ease name, e.g. 'lab' (the shared ease-lab curve). */
+  ease?: string;
+  /** Called once the scroll has arrived. */
+  onComplete?: () => void;
+}
+
 /** Scroll to a document position, through Lenis when it is running. */
-export function scrollToPosition(top: number, { immediate = false } = {}) {
+export function scrollToPosition(top: number, { immediate = false, duration, ease, onComplete }: ScrollToOptions = {}) {
   const instant = immediate || prefersReducedMotion();
   navigating = true;
   window.clearTimeout(navigatingTimer);
+  const done = () => {
+    endNavigating();
+    onComplete?.();
+  };
   if (lenis) {
-    lenis.scrollTo(top, { duration: 1.4, immediate: instant, force: true, onComplete: endNavigating });
-    if (instant) endNavigating();
+    lenis.scrollTo(top, {
+      duration: duration ?? 1.4,
+      easing: ease ? gsap.parseEase(ease) : undefined,
+      immediate: instant,
+      force: true,
+      onComplete: done,
+    });
+    if (instant) done();
   } else {
     gsap.to(window, {
-      duration: instant ? 0 : 1.2,
+      duration: instant ? 0 : (duration ?? 1.2),
       scrollTo: top,
-      ease: 'power2.inOut',
-      onComplete: endNavigating,
+      ease: ease ?? 'power2.inOut',
+      onComplete: done,
     });
   }
 }

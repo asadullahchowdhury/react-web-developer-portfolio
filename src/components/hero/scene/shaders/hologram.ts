@@ -7,7 +7,8 @@
  *
  *  - horizontal 1px scanlines every `uLinePitch` CSS px
  *  - rim: outline found by sampling the mask's alpha around each pixel
- *  - vertical fade: 15% at the top → 100% at 35% down
+ *  - the portrait is a tinted, lightly sharpened image modulated by the lines
+ *  - vertical fade: 45% at the very top → 100% at 12% down
  *  - `uReveal` 0 → 1 scans the figure in from the top, with a bright front line
  *  - `uFlicker` multiplies the whole result (kept within 3% by the animation)
  */
@@ -34,23 +35,34 @@ export const hologramFragment = /* glsl */ `
 
   void main() {
     vec4 m = texture2D(uMask, vUv);
-    float luma = dot(m.rgb, vec3(0.299, 0.587, 0.114));
-    float body = m.a * luma;
+    vec3 W = vec3(0.299, 0.587, 0.114);
 
     // Rim: alpha drop to any neighbour within uEdge
-    float n = min(
-      min(texture2D(uMask, vUv + vec2(uEdge, 0.0)).a, texture2D(uMask, vUv - vec2(uEdge, 0.0)).a),
-      min(texture2D(uMask, vUv + vec2(0.0, uEdge)).a, texture2D(uMask, vUv - vec2(0.0, uEdge)).a)
-    );
+    vec4 mr = texture2D(uMask, vUv + vec2(uEdge, 0.0));
+    vec4 ml = texture2D(uMask, vUv - vec2(uEdge, 0.0));
+    vec4 mu = texture2D(uMask, vUv + vec2(0.0, uEdge));
+    vec4 md = texture2D(uMask, vUv - vec2(0.0, uEdge));
+    float n = min(min(mr.a, ml.a), min(mu.a, md.a));
     float edge = clamp(m.a - n, 0.0, 1.0);
+
+    // Light unsharp mask on luminance (inside the figure only) so facial
+    // detail stays crisp without drawn outlines
+    float luma = dot(m.rgb, W);
+    float around = (dot(mr.rgb, W) + dot(ml.rgb, W) + dot(mu.rgb, W) + dot(md.rgb, W)) * 0.25;
+    luma = clamp(luma + (luma - around) * 0.7 * n, 0.0, 1.0);
+    // Luminance stretched so skin reads clearly brighter than hair, shirt and
+    // sunglasses (the face needs that contrast to be recognisable); floor of
+    // 22% so dark clothing still reads as part of the figure
+    float body = m.a * mix(0.22, 1.0, smoothstep(0.04, 0.62, luma));
 
     // Thin horizontal scanlines at a fixed screen pitch (crisp at any stage size)
     float pitch = uLinePitch * uPixelRatio;
     float s = mod(gl_FragCoord.y, pitch);
     float line = 1.0 - smoothstep(uPixelRatio * 0.6, uPixelRatio * 1.4, s);
 
-    // 15% at the top, full strength from 35% down
-    float fade = mix(0.15, 1.0, smoothstep(1.0, 0.65, vUv.y));
+    // Soft top edge only: 45% at the very top, full strength from 12% down,
+    // so the head (top quarter of the portrait) stays at near-full strength
+    float fade = mix(0.45, 1.0, smoothstep(1.0, 0.88, vUv.y));
 
     // Scan-in from the top
     float front = 1.0 - uReveal;
@@ -58,7 +70,10 @@ export const hologramFragment = /* glsl */ `
     float scanning = step(0.001, uReveal) * step(uReveal, 0.999);
     float scanLine = (1.0 - smoothstep(0.0, 0.012, abs(vUv.y - front))) * scanning * m.a;
 
-    float alpha = (body * line * 0.9 + edge) * fade * revealed * uOpacity * uFlicker;
+    // The portrait is a tinted image that the scanlines modulate (40% between
+    // lines, 100% on them), so the face stays recognisable at small sizes
+    float image = body * mix(0.4, 1.0, line);
+    float alpha = (image + edge) * fade * revealed * uOpacity * uFlicker;
     alpha += scanLine * 0.9;
 
     vec3 color = mix(uColor, uRim, clamp(edge + scanLine, 0.0, 1.0));

@@ -27,6 +27,10 @@ const Hologram = () => {
   const mesh = useRef<Mesh>(null);
   const mask = useLoader(TextureLoader, WORLD.hologram.maskUrl);
   mask.colorSpace = SRGBColorSpace;
+  const image = mask.image as { width: number; height: number };
+  // Plane follows the portrait's aspect; the rim is ~1.5 texels wide
+  const aspect = image.width / image.height;
+  const edge = Math.max(1.5 / image.width, 3 / MASK_SIZE);
 
   const material = useMemo(
     () =>
@@ -42,14 +46,14 @@ const Hologram = () => {
           uFlicker: { value: 1 },
           uLinePitch: { value: WORLD.hologram.linePitch },
           uPixelRatio: { value: 1 },
-          uEdge: { value: 3 / MASK_SIZE },
+          uEdge: { value: edge },
         },
         transparent: true,
         depthWrite: false,
         blending: AdditiveBlending,
         side: DoubleSide,
       }),
-    [mask],
+    [mask, edge],
   );
 
   const { height, baseY } = WORLD.hologram;
@@ -92,7 +96,7 @@ const Hologram = () => {
 
   return (
     <mesh ref={mesh} name="hologram" position={[0, baseY + height / 2, 0]} material={material} renderOrder={3}>
-      <planeGeometry args={[height, height]} />
+      <planeGeometry args={[height * aspect, height]} />
     </mesh>
   );
 };

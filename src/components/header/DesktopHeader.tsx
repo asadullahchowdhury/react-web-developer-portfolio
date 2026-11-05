@@ -133,6 +133,7 @@ const DesktopHeader = ({ compact, hidden, active, time, onNavigate }: DesktopHea
             <a
               href={`#${CONTACT_TARGET}`}
               onClick={onNavigate(CONTACT_TARGET)}
+              data-magnetic
               className="inline-flex h-11 items-center gap-2 rounded-full border border-strong px-5 text-[14px] font-medium text-ink-primary transition-colors hover:border-white/[0.28]"
             >
               <EmberDot />
@@ -190,6 +191,7 @@ const DesktopHeader = ({ compact, hidden, active, time, onNavigate }: DesktopHea
           <a
             href={`#${CONTACT_TARGET}`}
             onClick={onNavigate(CONTACT_TARGET)}
+            data-magnetic
             className="inline-flex h-11 items-center gap-2 rounded-full bg-ink-primary px-5 text-[14px] font-medium text-void transition-colors hover:bg-white"
           >
             <EmberDot />

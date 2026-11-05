@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { isHeroPinned, isNavigating } from '../../lib/scroll';
+import { isNavigating, isPinActive } from '../../lib/scroll';
 
 /** Desktop state 2 (floating glass bar) starts after this much scroll. */
 export const COMPACT_AFTER = 80;
@@ -15,7 +15,7 @@ export interface HeaderScrollState {
 
 /**
  * Header scroll behaviour: compact after 80 px; hide on scroll down, show on
- * scroll up; never hidden near the top, during the hero pin, during a
+ * scroll up; never hidden near the top, during any pinned section, during a
  * navigation scroll, or while `locked` (e.g. the mobile menu is open).
  */
 export function useHeaderScroll(locked: boolean): HeaderScrollState {
@@ -32,7 +32,7 @@ export function useHeaderScroll(locked: boolean): HeaderScrollState {
       setState((prev) => {
         const compact = y > COMPACT_AFTER;
         let hidden = prev.hidden;
-        if (locked || !compact || isHeroPinned() || isNavigating()) hidden = false;
+        if (locked || !compact || isPinActive() || isNavigating()) hidden = false;
         else if (delta > DIRECTION_THRESHOLD) hidden = true;
         else if (delta < -DIRECTION_THRESHOLD) hidden = false;
         return prev.compact === compact && prev.hidden === hidden ? prev : { compact, hidden };

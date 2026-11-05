@@ -35,7 +35,9 @@ const HeroStage = ({ control, stageRef }: HeroStageProps) => (
       {!control.expanded && <SceneCanvas control={control} />}
     </div>
 
-    <p className="sr-only">{heroCopy.sceneDescription}</p>
+    {!heroCopy.sceneDescription.includes('[PLACEHOLDER]') && (
+      <p className="sr-only">{heroCopy.sceneDescription}</p>
+    )}
 
     {/* Panel A — near layer; tablet and up */}
     <div data-panel="deploy" className="absolute right-0 top-[6%] hidden w-[166px] md:block xl:w-[184px]">

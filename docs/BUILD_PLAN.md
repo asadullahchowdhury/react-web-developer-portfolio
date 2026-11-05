@@ -18,7 +18,7 @@ Progress is tracked in `docs/BUILD_PROGRESS.md`. Create it in Phase 0 and keep i
 7. **Code style:** TypeScript, React 18 function components, Tailwind with the CSS-variable tokens from §5, small reusable components, data in typed files (not hard-coded in JSX). No new UI libraries beyond those already added for the hero (R3F, drei, postprocessing, GSAP, Lenis).
 8. **Motion:** GSAP + ScrollTrigger only (no AOS in redesigned sections). Every animation has a `prefers-reduced-motion` fallback. Use the shared `ease-lab` curve `cubic-bezier(0.2, 0.7, 0, 1)`.
 9. **Accessibility:** real `<a>`/`<button>`/`<label>`, 44 px targets, visible focus rings (§5), decorative SVG `aria-hidden`, text contrast ≥ 4.5:1.
-10. **Git:** work on branch `redesign`. One commit per phase (or per sub-step if large), message format `redesign(phase-N): <what>`. Never push, never force, never rewrite history.
+10. **Git:** work on the current branch `theme/v2-redesign` (do not create a new one). One commit per phase (or per sub-step if large), message format `redesign(phase-N): <what>`. Never push, never force, never rewrite history.
 11. **When blocked:** if something can't be done without the owner's input, log it under "Blocked / questions", use a placeholder, and **continue with the next phase**. Stop entirely only if the build is broken and you can't fix it.
 
 ---
@@ -54,7 +54,7 @@ This build may run across several sessions (usage limits, restarts). Every sessi
 
 ### Phase 0 — Preflight
 - Read the whole spec and this plan.
-- Check `git status` (must be clean; if not, commit pending work as `wip: before redesign phases`). Create/switch to branch `redesign`.
+- Check `git status` (must be clean; if not, verify the pending work builds and commit it as `wip: before redesign phases`). Stay on branch `theme/v2-redesign`.
 - Inventory what's already built (hero, header) vs. spec. Note gaps in progress.
 - Create `docs/BUILD_PROGRESS.md` with the template at the bottom of this file.
 - **Done when:** progress file exists, build passes, inventory written.
