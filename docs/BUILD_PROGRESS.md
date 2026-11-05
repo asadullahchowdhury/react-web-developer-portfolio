@@ -6,8 +6,8 @@
 | 1 Foundation | ☑ | 6331d49 | Data files, useReducedMotion, useReveal, SectionHeader, chapter helper |
 | 2 Work | ☑ | fdb8eb7 | Pinned horizontal track, stacked mobile, native-scroll fallback |
 | 3 About | ☑ | d16afaa | Statement, portrait placeholder + scanline sweep, facts, principles |
-| 4 Stack | ☑ | (this commit) | Exploded isometric diagram, 160vh pin, mini diagram + cards on mobile |
-| 5 Experience | ☐ | | |
+| 4 Stack | ☑ | 0010aa4 | Exploded isometric diagram, 160vh pin, mini diagram + cards on mobile |
+| 5 Experience | ☑ | (this commit) | Commit graph aligned to cards (1280–1920), top-down draw, mobile timeline |
 | 6 Contact + Footer | ☐ | | |
 | 7 Integration & polish | ☐ | | |
 | 8 QA & report | ☐ | | |
@@ -57,6 +57,10 @@
 - Phase 4: reduced motion or touch at desktop width shows the full diagram static (layer 01 active, all labels visible); hover still highlights layers. Below 768 px: mini diagram + layer cards with chips (Interface card has the 35% signal border). Mobile omits the lead, as §19 lists only HUD, H2, diagram and cards.
 - Phase 4: the H2 is 44 px between 768 and 1279 px so "One product, four layers." fits the 0.85fr column; 52 px from 1280.
 - Phase 4: the diagram is aria-hidden; a visually hidden list gives screen readers every layer and tool on desktop. Removed the old Skills.tsx (percentage bars).
+- Phase 5: roles live in `src/data/experience.ts`: title "Full-Stack Developer" at Codevioso (codevioso.com link), Redishketch Frontend Lead and Frontend Developer. All old metrics (100k+ users, 40%, 60%, 15+, 25+, 100% satisfaction, 95% coverage) are gone. Redishketch years are shown as written in the spec and flagged `periodConfirmed: false` with `// TODO confirm`. No highlights until real ones are supplied.
+- Phase 5: graph nodes are positioned from each card's measured date line (ResizeObserver), so they align at any width — verified 0 px offset at 1280, 1440 and 1920.
+- Phase 5: the graph line draws top → bottom (newest first), scrubbed from the list's top at 60% of the viewport to its bottom at 60%; each node pops (0.6 → 1) and its card fades up when its date line reaches the same 60% line (reverses on scroll-up). The Codevioso lane below the merge is drawn faint, since the spec only describes it from the merge to HEAD.
+- Phase 5: mobile cards use the full descriptions — §20 asks for "short descriptions" but gives none.
 - Verification note: the Claude browser pane often runs this tab at 0–2 frames per second, so time-based animations (entrances, scrubs) were checked by state (start state applied, trigger fires, end values after settling) rather than watched live.
 
 ## Open items (content needed from Rahat)
