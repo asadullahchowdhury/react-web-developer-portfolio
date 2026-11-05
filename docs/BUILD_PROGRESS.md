@@ -4,8 +4,8 @@
 |---|---|---|---|
 | 0 Preflight | ☑ | 0eac261 | Inventory below; build passes |
 | 1 Foundation | ☑ | 6331d49 | Data files, useReducedMotion, useReveal, SectionHeader, chapter helper |
-| 2 Work | ☑ | (this commit) | Pinned horizontal track, stacked mobile, native-scroll fallback |
-| 3 About | ☐ | | |
+| 2 Work | ☑ | fdb8eb7 | Pinned horizontal track, stacked mobile, native-scroll fallback |
+| 3 About | ☑ | (this commit) | Statement, portrait placeholder + scanline sweep, facts, principles |
 | 4 Stack | ☐ | | |
 | 5 Experience | ☐ | | |
 | 6 Contact + Footer | ☐ | | |
@@ -47,6 +47,11 @@
 - Phase 2: no snap (optional in §11.2).
 - Phase 2: the "never hide the header" rule now covers every pinned section (shared pin registry in lib/scroll).
 - Phase 2: removed the old Projects.tsx (three "concept" projects with Pexels images) and the unused project-placeholder.svg.
+- Phase 3: About copy lives in `src/data/about.ts`, verbatim from §17. The statement scales 28 px (mobile) → 36 px (768–1023) → 46 px (≥ 1024) so it fits the 1.5fr column on tablets.
+- Phase 3: the portrait shows the outlined placeholder (§17): the hologram's head-and-shoulders mask drawn as faint signal-blue scanlines, so the "hologram becomes the person" idea already reads. `public/assets/images/me.jpg` (the old About photo) exists but the spec asks for the new portrait (§14), so it isn't used.
+- Phase 3: §17 asks for "shortened text per artboard 10" on mobile principle cards; artboard 10 isn't available and no short copy is given, so mobile uses the full texts rather than invented ones.
+- Phase 3: portrait entrance is a one-time GSAP clip reveal with a glowing scanline sweeping top → bottom ([impl choice] in §17). Removed the old About blob CSS.
+- Verification note: the Claude browser pane often runs this tab at 0–2 frames per second, so time-based animations (entrances, scrubs) were checked by state (start state applied, trigger fires, end values after settling) rather than watched live.
 
 ## Open items (content needed from Rahat)
 - Project 03 details + screenshot
