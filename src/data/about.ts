@@ -19,20 +19,27 @@ export const ABOUT = {
     { label: 'Availability', value: 'Product work & freelance', available: true },
   ],
   principlesLabel: 'How I work',
+  /**
+   * "How I work" pipeline. `label` sits on the node; the title is split into a
+   * primary `lead` and a tertiary `tail` (same words as before).
+   */
   principles: [
     {
       number: '01',
-      title: 'The whole system, not one layer',
+      label: 'Schema → UI',
+      title: { lead: 'The whole system,', tail: 'not one layer' },
       text: "Schema, API and interface designed together, so features don't fight each other later.",
     },
     {
       number: '02',
-      title: 'Clear for the people using it',
+      label: 'People',
+      title: { lead: 'Clear for the people', tail: 'using it' },
       text: 'Reliable, readable interfaces for the teams who live in these tools every day.',
     },
     {
       number: '03',
-      title: 'Built to be maintained',
+      label: 'After launch',
+      title: { lead: 'Built to be', tail: 'maintained' },
       text: 'Readable code and steady collaboration, so the product stays healthy after launch.',
     },
   ],

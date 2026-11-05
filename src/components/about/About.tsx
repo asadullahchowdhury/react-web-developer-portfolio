@@ -2,13 +2,14 @@ import { useRef } from 'react';
 import { ABOUT } from '../../data/about';
 import { chapterLabel } from '../../data/site';
 import { useReveal } from '../../hooks/useReveal';
+import HowIWork from './HowIWork';
 import Portrait from './Portrait';
 
 /**
  * About (spec §17). Desktop: HUD → statement + body | portrait (1.5fr / 1fr,
- * aligned to the bottom) → four facts → "How I work" cards.
+ * aligned to the bottom) → four facts → "How I work" pipeline.
  * Mobile: HUD → statement → portrait → first sentence of the body → facts as
- * a ruled list → stacked cards.
+ * a ruled list → stacked pipeline steps.
  */
 const About = () => {
   const section = useRef<HTMLElement>(null);
@@ -71,27 +72,7 @@ const About = () => {
         </dl>
 
         {/* How I work */}
-        <div className="flex flex-col gap-5 md:gap-6">
-          <h3 data-reveal="fade" className="font-mono text-[11px] uppercase tracking-[0.12em] text-ink-tertiary">
-            {ABOUT.principlesLabel}
-          </h3>
-          <ul className="grid grid-cols-1 gap-4 md:grid-cols-3 md:gap-5">
-            {ABOUT.principles.map((p) => (
-              <li
-                key={p.number}
-                data-reveal="fade"
-                data-spotlight
-                className="flex flex-col gap-3 rounded-[18px] border border-white/[0.08] bg-surface-card p-5 md:gap-4 md:p-7"
-              >
-                <span className="font-mono text-[12px] text-signal">{p.number}</span>
-                <h4 className="text-[18px] font-medium leading-[1.3] tracking-[-0.01em] text-ink-primary md:text-[20px]">
-                  {p.title}
-                </h4>
-                <p className="text-[15px] leading-[1.6] text-ink-secondary">{p.text}</p>
-              </li>
-            ))}
-          </ul>
-        </div>
+        <HowIWork />
       </div>
     </section>
   );
