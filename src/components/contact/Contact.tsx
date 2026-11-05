@@ -112,7 +112,7 @@ const Contact = () => {
             <a
               data-reveal="fade"
               href={`mailto:${SITE.email}`}
-              className="w-fit text-[22px] font-medium tracking-[-0.02em] text-ink-primary underline decoration-white/30 underline-offset-[6px] transition-colors hover:decoration-ink-primary md:text-[30px]"
+              className="link-draw w-fit text-[22px] font-medium tracking-[-0.02em] text-ink-primary md:text-[30px]"
             >
               {SITE.email}
             </a>
@@ -127,7 +127,7 @@ const Contact = () => {
                     className="group flex h-14 items-center justify-between border-t border-white/[0.08] text-[16px] text-ink-primary"
                   >
                     <span className="inline-flex items-center gap-2">
-                      {link.label}
+                      <span className="link-draw link-draw-bare">{link.label}</span>
                       <ArrowUpRight size={16} strokeWidth={1.75} aria-hidden="true" className="text-ink-tertiary transition-colors group-hover:text-ink-primary" />
                     </span>
                     <span className="font-mono text-[12px] text-ink-tertiary">{link.hint}</span>

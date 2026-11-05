@@ -28,7 +28,7 @@ const RoleCard = ({ role }: { role: Role }) => (
           href={role.companyUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="text-ink-body underline decoration-white/30 underline-offset-4 transition-colors hover:text-ink-primary hover:decoration-ink-primary"
+          className="link-draw text-ink-body transition-colors hover:text-ink-primary"
         >
           {role.company}
         </a>

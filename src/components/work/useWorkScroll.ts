@@ -14,7 +14,6 @@ export interface WorkScrollRefs {
   /** The visible window of the track (right column). */
   viewport: RefObject<HTMLElement>;
   track: RefObject<HTMLElement>;
-  counter: RefObject<HTMLElement>;
   fill: RefObject<HTMLElement>;
   /** "Scroll →" hint; fades out once the last card is current. */
   hint: RefObject<HTMLElement>;
@@ -36,18 +35,23 @@ export interface WorkScrollRefs {
  *  - 'native' desktop with reduced motion or touch: the track scrolls natively
  *  - 'stack'  below 768 px: cards stack, nothing to drive
  */
-export function useWorkScroll(refs: WorkScrollRefs, mode: 'pin' | 'native' | 'stack') {
+export function useWorkScroll(
+  refs: WorkScrollRefs,
+  mode: 'pin' | 'native' | 'stack',
+  /** Called with the 1-based current card whenever it changes. Must be stable. */
+  onCurrent: (index: number) => void,
+) {
   useEffect(() => {
     const section = refs.section.current;
     const viewport = refs.viewport.current;
     const track = refs.track.current;
-    const counter = refs.counter.current;
     const fill = refs.fill.current;
     const hint = refs.hint.current;
     const edge = refs.edge.current;
     if (!section || !viewport || !track || mode === 'stack') return;
 
     const cards = Array.from(track.querySelectorAll<HTMLElement>('[data-work-card]'));
+    let lastCurrent = 0;
     const total = cards.length;
 
     /** Counter, fill and fades for a given track offset (px, ≤ 0) and progress. */
@@ -70,7 +74,10 @@ export function useWorkScroll(refs: WorkScrollRefs, mode: 'pin' | 'native' | 'st
           card.style.opacity = String(BEHIND_OPACITY + (1 - BEHIND_OPACITY) * t);
         }
       });
-      if (counter) counter.textContent = String(current).padStart(2, '0');
+      if (current !== lastCurrent) {
+        lastCurrent = current;
+        onCurrent(current);
+      }
       if (fill) fill.style.transform = `scaleX(${progress})`;
       if (hint) hint.style.opacity = current === total ? '0' : '';
       if (edge) edge.style.opacity = String(Math.min(Math.max(-offset / EDGE, 0), 1));
@@ -147,5 +154,5 @@ export function useWorkScroll(refs: WorkScrollRefs, mode: 'pin' | 'native' | 'st
       cancelled = true;
       teardown();
     };
-  }, [refs.section, refs.viewport, refs.track, refs.counter, refs.fill, refs.hint, refs.edge, mode]);
+  }, [refs.section, refs.viewport, refs.track, refs.fill, refs.hint, refs.edge, mode, onCurrent]);
 }

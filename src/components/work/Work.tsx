@@ -1,10 +1,11 @@
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import { ArrowRight, Github } from 'lucide-react';
 import { PUBLISHED_PROJECTS } from '../../data/projects';
 import { chapterLabel, SITE } from '../../data/site';
 import { useMediaQuery } from '../../hooks/useMediaQuery';
 import { useReveal } from '../../hooks/useReveal';
 import { useSceneMode } from '../hero/useSceneMode';
+import RollingNumber from '../ui/RollingNumber';
 import ProjectCard from './ProjectCard';
 import { useWorkScroll } from './useWorkScroll';
 
@@ -26,7 +27,6 @@ const Work = () => {
   const section = useRef<HTMLElement>(null);
   const viewport = useRef<HTMLDivElement>(null);
   const track = useRef<HTMLDivElement>(null);
-  const counter = useRef<HTMLSpanElement>(null);
   const fill = useRef<HTMLSpanElement>(null);
   const hint = useRef<HTMLSpanElement>(null);
   const edge = useRef<HTMLSpanElement>(null);
@@ -35,7 +35,8 @@ const Work = () => {
   const belowMd = useMediaQuery('(max-width: 767px)');
   const mode = belowMd ? 'stack' : sceneMode.mobile || sceneMode.reducedMotion ? 'native' : 'pin';
 
-  useWorkScroll({ section, viewport, track, counter, fill, hint, edge }, mode);
+  const [current, setCurrent] = useState(1);
+  useWorkScroll({ section, viewport, track, fill, hint, edge }, mode, setCurrent);
   // In pin mode Work slides up over the pinned hero, so its heading rises with
   // the track as one block instead of revealing late (POLISH P1-6)
   const reveal = (kind: 'lines' | 'fade') => (mode === 'pin' ? undefined : kind);
@@ -73,7 +74,7 @@ const Work = () => {
           </p>
           <div data-reveal={reveal('fade')} className="hidden items-center gap-5 md:flex" aria-hidden="true">
             <span className="font-mono text-counter text-ink-primary">
-              <span ref={counter}>01</span>
+              <RollingNumber value={String(current).padStart(2, '0')} />
               <span className="ml-2 text-[14px] tracking-normal text-ink-tertiary">/ {total}</span>
             </span>
             <span className="h-8 w-px bg-white/10" />

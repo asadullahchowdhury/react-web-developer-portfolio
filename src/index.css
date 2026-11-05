@@ -170,3 +170,44 @@
     display: none;
   }
 }
+
+/* ---- Polish P2-13: rolling counter digits (RollingNumber) ---- */
+@keyframes roll-in {
+  from { transform: translateY(calc(var(--roll-dir, 1) * 100%)); }
+  to { transform: none; }
+}
+@keyframes roll-out {
+  from { transform: none; }
+  to { transform: translateY(calc(var(--roll-dir, 1) * -100%)); }
+}
+.roll-in { animation: roll-in 200ms var(--ease-lab) both; }
+.roll-out { animation: roll-out 200ms var(--ease-lab) both; }
+@media (prefers-reduced-motion: reduce) {
+  .roll-in { animation: none; }
+  .roll-out { display: none; }
+}
+
+/* ---- Polish P2-14: underline draws left → right on hover / focus ----
+   `.link-draw` on the text element; it draws when it or its link is hovered.
+   A faint resting line stays unless `.link-draw-bare` is added. */
+.link-draw {
+  --link-base: rgb(255 255 255 / 0.3);
+  background-image: linear-gradient(currentColor, currentColor), linear-gradient(var(--link-base), var(--link-base));
+  background-size: 0% 1px, 100% 1px;
+  background-position: left bottom, left bottom;
+  background-repeat: no-repeat;
+  padding-bottom: 0.12em;
+  transition: background-size 300ms var(--ease-lab);
+}
+.link-draw-bare {
+  --link-base: transparent;
+}
+a.link-draw:hover,
+a.link-draw:focus-visible,
+a:hover .link-draw,
+a:focus-visible .link-draw {
+  background-size: 100% 1px, 100% 1px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .link-draw { transition: none; }
+}

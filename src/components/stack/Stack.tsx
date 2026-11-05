@@ -5,6 +5,7 @@ import { useMediaQuery } from '../../hooks/useMediaQuery';
 import { useReveal } from '../../hooks/useReveal';
 import { useSceneMode } from '../hero/useSceneMode';
 import StackDiagram from './StackDiagram';
+import RollingNumber from '../ui/RollingNumber';
 import { FULL_GEOMETRY, MINI_GEOMETRY } from './stackGeometry';
 import { useStackScroll } from './useStackScroll';
 
@@ -115,7 +116,7 @@ const Stack = () => {
       {/* Desktop footer row */}
       <div className="mt-6 hidden items-center justify-between font-mono text-[12px] text-ink-tertiary md:flex">
         <span aria-hidden="true">
-          Layer {STACK_LAYERS[active].number} of {total}
+          Layer <RollingNumber value={STACK_LAYERS[active].number} /> of {total}
         </span>
         {sequence && (
           <span aria-hidden="true" className="flex items-center gap-4">
