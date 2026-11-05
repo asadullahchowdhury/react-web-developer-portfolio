@@ -7,8 +7,7 @@
  *
  *  - horizontal 1px scanlines every `uLinePitch` CSS px
  *  - rim: outline found by sampling the mask's alpha around each pixel
- *  - the portrait is a tinted image modulated by the lines, plus thin strokes
- *    on luminance edges (glasses, beard, hairline) so the face reads
+ *  - the portrait is a tinted, lightly sharpened image modulated by the lines
  *  - vertical fade: 45% at the very top → 100% at 12% down
  *  - `uReveal` 0 → 1 scans the figure in from the top, with a bright front line
  *  - `uFlicker` multiplies the whole result (kept within 3% by the animation)
@@ -36,11 +35,7 @@ export const hologramFragment = /* glsl */ `
 
   void main() {
     vec4 m = texture2D(uMask, vUv);
-    float luma = dot(m.rgb, vec3(0.299, 0.587, 0.114));
-    // Luminance stretched so skin reads clearly brighter than hair, shirt and
-    // sunglasses (the face needs that contrast to be recognisable); floor of
-    // 22% so dark clothing still reads as part of the figure
-    float body = m.a * mix(0.22, 1.0, smoothstep(0.04, 0.62, luma));
+    vec3 W = vec3(0.299, 0.587, 0.114);
 
     // Rim: alpha drop to any neighbour within uEdge
     vec4 mr = texture2D(uMask, vUv + vec2(uEdge, 0.0));
@@ -50,11 +45,15 @@ export const hologramFragment = /* glsl */ `
     float n = min(min(mr.a, ml.a), min(mu.a, md.a));
     float edge = clamp(m.a - n, 0.0, 1.0);
 
-    // Inner detail: luminance edges (sunglasses, beard, hairline, collar) drawn
-    // as thin bright strokes, so the face reads even when it is small
-    vec3 W = vec3(0.299, 0.587, 0.114);
-    vec2 grad = vec2(dot(mr.rgb, W) - dot(ml.rgb, W), dot(mu.rgb, W) - dot(md.rgb, W));
-    float detail = smoothstep(0.08, 0.32, length(grad)) * n;
+    // Light unsharp mask on luminance (inside the figure only) so facial
+    // detail stays crisp without drawn outlines
+    float luma = dot(m.rgb, W);
+    float around = (dot(mr.rgb, W) + dot(ml.rgb, W) + dot(mu.rgb, W) + dot(md.rgb, W)) * 0.25;
+    luma = clamp(luma + (luma - around) * 0.7 * n, 0.0, 1.0);
+    // Luminance stretched so skin reads clearly brighter than hair, shirt and
+    // sunglasses (the face needs that contrast to be recognisable); floor of
+    // 22% so dark clothing still reads as part of the figure
+    float body = m.a * mix(0.22, 1.0, smoothstep(0.04, 0.62, luma));
 
     // Thin horizontal scanlines at a fixed screen pitch (crisp at any stage size)
     float pitch = uLinePitch * uPixelRatio;
@@ -71,14 +70,13 @@ export const hologramFragment = /* glsl */ `
     float scanning = step(0.001, uReveal) * step(uReveal, 0.999);
     float scanLine = (1.0 - smoothstep(0.0, 0.012, abs(vUv.y - front))) * scanning * m.a;
 
-    // The portrait itself is drawn as a tinted image; scanlines modulate it
-    // (62% between lines, 100% on them) instead of being the only signal, so
-    // the face stays recognisable (owner request)
-    float image = body * mix(0.62, 1.0, line);
-    float alpha = (image + detail * 0.55 + edge) * fade * revealed * uOpacity * uFlicker;
+    // The portrait is a tinted image that the scanlines modulate (40% between
+    // lines, 100% on them), so the face stays recognisable at small sizes
+    float image = body * mix(0.4, 1.0, line);
+    float alpha = (image + edge) * fade * revealed * uOpacity * uFlicker;
     alpha += scanLine * 0.9;
 
-    vec3 color = mix(uColor, uRim, clamp(edge + detail * 0.6 + scanLine, 0.0, 1.0));
+    vec3 color = mix(uColor, uRim, clamp(edge + scanLine, 0.0, 1.0));
     gl_FragColor = vec4(color, alpha);
     #include <colorspace_fragment>
   }
