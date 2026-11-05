@@ -99,12 +99,16 @@ export function initSmoothScroll(onRefresh?: () => void): () => void {
   };
 }
 
-/** True while the hero is pinned (set by useHeroScroll); the header never hides then. */
-let heroPinned = false;
-export const setHeroPinned = (pinned: boolean) => {
-  heroPinned = pinned;
+/**
+ * Pinned sections currently holding the viewport (hero, work, stack…).
+ * The header never hides while any pin is active.
+ */
+const activePins = new Set<string>();
+export const setPinActive = (key: string, active: boolean) => {
+  if (active) activePins.add(key);
+  else activePins.delete(key);
 };
-export const isHeroPinned = () => heroPinned;
+export const isPinActive = () => activePins.size > 0;
 
 /**
  * Locks page scrolling (e.g. full-screen menu): pauses Lenis and stops native

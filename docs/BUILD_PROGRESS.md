@@ -3,8 +3,8 @@
 | Phase | Status | Commit | Notes |
 |---|---|---|---|
 | 0 Preflight | ☑ | 0eac261 | Inventory below; build passes |
-| 1 Foundation | ☑ | (this commit) | Data files, useReducedMotion, useReveal, SectionHeader, chapter helper |
-| 2 Work | ☐ | | |
+| 1 Foundation | ☑ | 6331d49 | Data files, useReducedMotion, useReveal, SectionHeader, chapter helper |
+| 2 Work | ☑ | (this commit) | Pinned horizontal track, stacked mobile, native-scroll fallback |
 | 3 About | ☐ | | |
 | 4 Stack | ☐ | | |
 | 5 Experience | ☐ | | |
@@ -39,6 +39,14 @@
 
 - Phase 1: tokens, fonts, section order, Lenis/ScrollTrigger (single lazy instance) and the removed hero-era components were already in place from the hero work. Added `src/data/{site,projects,experience,stack}.ts`, `useReducedMotion`, `useReveal` (masked line rise + 12 px fade-up, once at 20% into view, nothing hidden with reduced motion), `SectionHeader` and `chapterLabel()` (§2.3 mapping). Header socials/status now read from `data/site.ts`.
 - Phase 1: AOS stays for the not-yet-redesigned sections and is removed in Phase 7.
+- Phase 2: the hero hand-off keeps the Work section sliding up over the pinned hero (built with the hero) instead of crossfading cards in from the panel positions. The Work pin starts exactly where the hero pin ends, so "Enter the lab" and nav Work land on the start of Work.
+- Phase 2: at desktop widths with reduced motion or a coarse pointer, the Work track becomes a native horizontal scroller (role=region, focusable), per spec §13 "scroll natively". Below 768 px the cards stack.
+- Phase 2: §11.2 advances the counter when a card's centre passes the track's left third, but the last card never gets there. The line now slides from the left third (start of the pin) to the right edge (end), so the counter reaches 03.
+- Phase 2: card image height is min(360 px, 38vh) so the pinned section fits shorter laptop screens (342 px at 900 tall).
+- Phase 2: cards without a public link (CAFM, Project 03) are focusable articles so keyboard users can bring them into view; focusing any card scrolls the pin to it.
+- Phase 2: no snap (optional in §11.2).
+- Phase 2: the "never hide the header" rule now covers every pinned section (shared pin registry in lib/scroll).
+- Phase 2: removed the old Projects.tsx (three "concept" projects with Pexels images) and the unused project-placeholder.svg.
 
 ## Open items (content needed from Rahat)
 - Project 03 details + screenshot

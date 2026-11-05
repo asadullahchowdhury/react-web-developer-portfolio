@@ -5,7 +5,7 @@ import Header from './components/Header';
 import Hero from './components/hero/Hero';
 import About from './components/About';
 import Skills from './components/Skills';
-import Projects from './components/Projects';
+import Work from './components/work/Work';
 import Experience from './components/Experience';
 import Contact from './components/Contact';
 import Footer from './components/Footer';
@@ -32,7 +32,7 @@ function App() {
         {/* Positioned above the pinned hero so Work slides over it at the
             end of the pin (spec §11.1 hand-off) */}
         <div className="relative z-10">
-          <Projects />
+          <Work />
           <About />
           <Skills />
           <Experience />
