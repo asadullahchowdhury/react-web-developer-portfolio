@@ -59,6 +59,18 @@ export const PROJECTS: readonly Project[] = [
     // Private repository and no public deployment yet
     link: null,
   },
+  {
+    id: 'innup',
+    title: 'INnUP',
+    category: 'E-commerce · Online print shop',
+    description:
+      'Online shop for a Bremen print house: 20 print product lines with price calculators, ordering on invoice and an online design tool.',
+    pathLabel: 'innup.de / home',
+    image: '/assets/images/innup.webp',
+    imageAlt: 'INnUP online print shop home page',
+    tags: ['Nuxt', 'Vue.js', 'E-commerce'],
+    link: { href: 'https://www.innup.de/', label: 'Open INnUP' },
+  },
 ];
 
 /**

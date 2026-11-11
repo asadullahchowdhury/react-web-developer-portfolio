@@ -103,6 +103,7 @@ const IMAGE_TARGETS: Record<string, string> = {
   'barberly.webp': fileURLToPath(new URL('./public/assets/images/', import.meta.url)),
   'cafm-platform.webp': fileURLToPath(new URL('./public/assets/images/', import.meta.url)),
   'hotel-blue-castle.webp': fileURLToPath(new URL('./public/assets/images/', import.meta.url)),
+  'innup.webp': fileURLToPath(new URL('./public/assets/images/', import.meta.url)),
   'portrait-hologram.webp': fileURLToPath(new URL('./public/assets/lab/', import.meta.url)),
   'og-image.png': fileURLToPath(new URL('./public/', import.meta.url)),
 };
