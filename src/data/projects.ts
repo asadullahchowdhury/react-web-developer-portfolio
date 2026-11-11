@@ -44,7 +44,8 @@ export const PROJECTS: readonly Project[] = [
     image: '/assets/images/barberly.webp',
     imageAlt: 'Barberly booking dashboard',
     tags: ['Vue.js', 'Node.js', 'Laravel', 'Stripe'],
-    link: { href: 'https://barberly.thethemeai.com', label: 'Open Barberly' },
+    // Live site (barberly.thethemeai.com) returned 404 on 2026-11-11; link removed until it is back
+    link: null,
   },
   {
     id: 'hotel-blue-castle',
