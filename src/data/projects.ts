@@ -44,7 +44,8 @@ export const PROJECTS: readonly Project[] = [
     image: '/assets/images/barberly.webp',
     imageAlt: 'Barberly booking dashboard',
     tags: ['Vue.js', 'Node.js', 'Laravel', 'Stripe'],
-    link: { href: 'https://barberly.thethemeai.com', label: 'Open Barberly' },
+    // Live site (barberly.thethemeai.com) returned 404 on 2026-11-11; link removed until it is back
+    link: null,
   },
   {
     id: 'hotel-blue-castle',
@@ -58,6 +59,19 @@ export const PROJECTS: readonly Project[] = [
     tags: ['Laravel', 'Vue.js', 'MySQL', 'Full-stack'],
     // Private repository and no public deployment yet
     link: null,
+  },
+  {
+    id: 'innup',
+    title: 'INnUP',
+    category: 'E-commerce · Freelance',
+    // Owner's wording (2026-11-11)
+    description:
+      'Server-rendered storefront for a German print shop: 200+ components, 169+ pages, live price calculation and multi-language support. Freelance.',
+    pathLabel: 'innup.de / home',
+    image: '/assets/images/innup.webp',
+    imageAlt: 'INnUP online print shop home page',
+    tags: ['Nuxt 3', 'Vue 3', 'SSR', 'SEO'],
+    link: { href: 'https://www.innup.de/', label: 'Open INnUP' },
   },
 ];
 

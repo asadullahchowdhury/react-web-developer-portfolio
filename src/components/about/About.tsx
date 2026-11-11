@@ -4,6 +4,7 @@ import { chapterLabel } from '../../data/site';
 import { useReveal } from '../../hooks/useReveal';
 import HowIWork from './HowIWork';
 import Portrait from './Portrait';
+import Signature from './Signature';
 
 /**
  * About (spec §17). Desktop: HUD → statement + body | portrait (1.5fr / 1fr,
@@ -42,6 +43,8 @@ const About = () => {
             <p data-reveal="fade" className="hidden max-w-[600px] text-[17px] leading-[1.65] text-ink-secondary md:block">
               {ABOUT.body.full}
             </p>
+            {/* Hand-signed sign-off (desktop) */}
+            <Signature className="-mt-2 hidden w-[240px] md:block" />
           </div>
 
           <Portrait />
@@ -50,6 +53,7 @@ const About = () => {
           <p data-reveal="fade" className="text-[15px] leading-[1.6] text-ink-secondary md:hidden">
             {ABOUT.body.firstSentence}
           </p>
+          <Signature className="-mt-3 w-[176px] md:hidden" />
         </div>
 
         {/* Facts */}
