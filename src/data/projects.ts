@@ -63,13 +63,14 @@ export const PROJECTS: readonly Project[] = [
   {
     id: 'innup',
     title: 'INnUP',
-    category: 'E-commerce · Online print shop',
+    category: 'E-commerce · Freelance',
+    // Owner's wording (2026-11-11)
     description:
-      'Online shop for a Bremen print house: 20 print product lines with price calculators, ordering on invoice and an online design tool.',
+      'Server-rendered storefront for a German print shop: 200+ components, 169+ pages, live price calculation and multi-language support. Freelance.',
     pathLabel: 'innup.de / home',
     image: '/assets/images/innup.webp',
     imageAlt: 'INnUP online print shop home page',
-    tags: ['Nuxt', 'Vue.js', 'E-commerce'],
+    tags: ['Nuxt 3', 'Vue 3', 'SSR', 'SEO'],
     link: { href: 'https://www.innup.de/', label: 'Open INnUP' },
   },
 ];
