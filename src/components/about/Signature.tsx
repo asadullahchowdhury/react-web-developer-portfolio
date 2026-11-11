@@ -21,8 +21,9 @@ const mask: CSSProperties = {
  * Hand-signed sign-off under the About statement. The signature's shape masks
  * a soft white → signal-blue gradient (the hologram palette), tilted slightly.
  *
- * Entrance (once, as it comes into view): the signature "writes" itself left
- * to right while a small glowing pen tip rides the edge, 1.4 s ease-lab.
+ * Entrance (as it is reached scrolling down): the signature "writes" itself
+ * left to right while a small glowing pen tip rides the edge, 1.4 s. It
+ * replays only after it has left the screen below and is reached again.
  * Reduced motion: shown at once. Decorative (the name is already in the
  * text), so it is aria-hidden.
  */
@@ -36,19 +37,25 @@ const Signature = ({ className = '' }: { className?: string }) => {
     let cancelled = false;
     let teardown = () => {};
 
-    loadScrollLibs().then(() => {
+    loadScrollLibs().then(({ ScrollTrigger }) => {
       if (cancelled) return;
       const ctx = gsap.context(() => {
         const ink = el.querySelector('[data-signature-ink]');
         const tip = el.querySelector('[data-signature-tip]');
         gsap.set(ink, { clipPath: 'inset(-10% 100% -10% 0)' });
         gsap.set(tip, { left: '0%', opacity: 0 });
-        gsap
-          .timeline({ defaults: { ease: 'power1.inOut' }, scrollTrigger: { trigger: el, start: 'top 85%', once: true } })
+        const tl = gsap
+          .timeline({ paused: true, defaults: { ease: 'power1.inOut' } })
           .set(tip, { opacity: 1 }, 0.15)
           .to(ink, { clipPath: 'inset(-10% 0% -10% 0)', duration: 1.4 }, 0.15)
           .to(tip, { left: '100%', duration: 1.4 }, 0.15)
           .to(tip, { opacity: 0, duration: 0.35, ease: 'power1.out' }, 1.45);
+
+        // Writes whenever it is reached scrolling down. Scrolling back up past
+        // it never replays; once it has dropped fully below the screen it
+        // quietly resets, so the next pass down signs again.
+        ScrollTrigger.create({ trigger: el, start: 'top 85%', onEnter: () => tl.restart() });
+        ScrollTrigger.create({ trigger: el, start: 'top bottom', onLeaveBack: () => tl.pause(0) });
       }, el);
       teardown = () => ctx.revert();
     });
