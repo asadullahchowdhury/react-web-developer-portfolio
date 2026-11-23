@@ -17,5 +17,5 @@ export const STACK_LAYERS: readonly StackLayer[] = [
   },
   { number: '02', name: 'Application', tools: ['PHP', 'Laravel', 'Node.js'] },
   { number: '03', name: 'Data', tools: ['MySQL', 'MongoDB'] },
-  { number: '04', name: 'Workflow', tools: ['Git', 'Figma'] },
+  { number: '04', name: 'Workflow', tools: ['Git', 'Docker', 'Linear', 'Figma', 'Claude Code', 'ChatGPT', 'Gemini'] },
 ];
