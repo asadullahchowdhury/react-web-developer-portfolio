@@ -12,6 +12,8 @@ import './index.css';
 // Dev-only icon renderer (window.__renderIcons); not in production builds
 if (import.meta.env.DEV) import('./components/brand/devIcons');
 
+// #root already holds the pre-rendered page (scripts/prerender.mjs) for search
+// engines; createRoot replaces it with the live app.
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <App />
