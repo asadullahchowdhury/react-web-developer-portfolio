@@ -50,7 +50,7 @@ export function registerScrollTarget(id: string, resolve: () => number): () => v
   };
 }
 
-const SCROLL_KEY = `scroll:${window.location.pathname}`;
+const SCROLL_KEY = `scroll:${typeof window !== 'undefined' ? window.location.pathname : '/'}`;
 
 /** Saved position to restore — only on reload or back/forward, never on a fresh visit. */
 function takeSavedScroll(): number | null {

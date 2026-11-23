@@ -63,7 +63,7 @@ const Portrait = () => {
         <div data-portrait-media className="absolute inset-0">
           <img
             src={PORTRAIT.src}
-            alt="Rahat Chowdhury"
+            alt="Rahat Chowdhury, full-stack developer from Jashore, Bangladesh"
             width={PORTRAIT.width}
             height={PORTRAIT.height}
             loading="lazy"

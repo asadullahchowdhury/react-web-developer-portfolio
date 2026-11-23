@@ -1,2 +1,4 @@
 User-agent: *
 Allow: /
+
+Sitemap: https://rahat-chowdhury.vercel.app/sitemap.xml

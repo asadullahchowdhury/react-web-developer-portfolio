@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useLayoutEffect } from 'react';
 import Header from './components/Header';
 import Hero from './components/hero/Hero';
 import About from './components/about/About';
@@ -11,6 +11,9 @@ import { initPointerEffects } from './lib/pointerFx';
 import { initSmoothScroll } from './lib/scroll';
 
 function App() {
+  // Children's layout effects (the hero intro's start state) run first, so the
+  // pre-rendered page can be un-hidden here without a flash (see index.html)
+  useLayoutEffect(() => document.getElementById('root')?.removeAttribute('data-prerendered'), []);
   // Lenis + ScrollTrigger (lazy, after first paint)
   useEffect(() => initSmoothScroll(), []);
   // Magnetic buttons, card spotlights, footer glow (desktop pointer only)
