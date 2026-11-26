@@ -73,6 +73,19 @@ export const PROJECTS: readonly Project[] = [
     tags: ['Nuxt 3', 'Vue 3', 'SSR', 'SEO'],
     link: { href: 'https://www.innup.de/', label: 'Open INnUP' },
   },
+  {
+    id: 'poyshik',
+    title: 'Poyshik',
+    category: 'Mobile app · Android',
+    // From the public repo (asadullahchowdhury/poyshik) and its landing page
+    description:
+      'Offline-first expense tracker: log a payment in seconds, keep cash, bank and mobile-wallet balances apart, and see where the money goes. No sign-up.',
+    pathLabel: 'poyshik / landing',
+    image: '/assets/images/poyshik.webp',
+    imageAlt: 'Poyshik landing page with the app on two phones',
+    tags: ['Flutter', 'Dart', 'Riverpod', 'SQLite'],
+    link: { href: 'https://poyshik.vercel.app/', label: 'Open Poyshik' },
+  },
 ];
 
 /**
