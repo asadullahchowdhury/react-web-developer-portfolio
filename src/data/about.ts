@@ -15,7 +15,7 @@ export const ABOUT = {
   facts: [
     { label: 'Experience', value: '5+ years · frontend lead → full-stack' },
     { label: 'Currently', value: 'Full-Stack Developer, Codevioso' },
-    { label: 'Focus', value: 'SaaS, dashboards, business platforms' },
+    { label: 'Focus', value: 'SaaS, dashboards, business platforms, mobile apps' },
     { label: 'Availability', value: 'Product work & freelance', available: true },
   ],
   principlesLabel: 'How I work',
