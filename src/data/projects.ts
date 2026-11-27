@@ -86,6 +86,21 @@ export const PROJECTS: readonly Project[] = [
     tags: ['Flutter', 'Dart', 'Riverpod', 'SQLite'],
     link: { href: 'https://poyshik.vercel.app/', label: 'Open Poyshik' },
   },
+  {
+    id: 'piko',
+    title: 'Piko',
+    category: 'Web app · MVP',
+    // From the project's README and docs/ARCHITECTURE.md: Phase 1 (foundation)
+    // is done; the five tools are still marked "soon" in its registry
+    description:
+      'Free browser tools for everyday tasks: resize, compress and convert images, make QR codes, count words. Nothing is uploaded. MVP in progress.',
+    pathLabel: 'piko / home',
+    image: '/assets/images/piko.webp',
+    imageAlt: 'Piko home page with the tool search and an image resizer preview',
+    tags: ['Next.js', 'React', 'TypeScript', 'Tailwind'],
+    // Private repository; no public production URL yet
+    link: null,
+  },
 ];
 
 /**
