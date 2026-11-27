@@ -105,6 +105,7 @@ const IMAGE_TARGETS: Record<string, string> = {
   'hotel-blue-castle.webp': fileURLToPath(new URL('./public/assets/images/', import.meta.url)),
   'innup.webp': fileURLToPath(new URL('./public/assets/images/', import.meta.url)),
   'poyshik.webp': fileURLToPath(new URL('./public/assets/images/', import.meta.url)),
+  'piko.webp': fileURLToPath(new URL('./public/assets/images/', import.meta.url)),
   'portrait-hologram.webp': fileURLToPath(new URL('./public/assets/lab/', import.meta.url)),
   'og-image.png': fileURLToPath(new URL('./public/', import.meta.url)),
 };
